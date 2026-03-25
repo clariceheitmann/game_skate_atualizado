@@ -22,104 +22,112 @@ class Obj{
 
 class GarotoSkatista extends Obj{
 
-    dir = 0
-    vida = 5
-    pontos = 0
-    frame = 1
-    tempo = 0
+    constructor(x,y,w,h,a, tipo="M"){
+        super(x,y,w,h,a)
 
-    velX = 0 // 🔥 NOVO (movimento lateral)
+        this.tipo = tipo // 🔥 M ou F
 
-    // 🔥 NOVO SISTEMA DE PULO
-    velY = 0
-    gravidade = 0.6
-    pulando = false
+        this.dir = 0
+        this.vida = 5
+        this.pontos = 0
+        this.frame = 1
+        this.tempo = 0
+
+        this.velX = 0
+
+        this.velY = 0
+        this.gravidade = 0.6
+        this.pulando = false
+    }
 
     mov_car(){
 
-    // 🔥 movimento horizontal
-    this.x += this.velX
+        this.x += this.velX
 
-    if(this.x < 0){
+        if(this.x < 0){
             this.x = 0
-    }else if(this.x > 1200 - this.w){
+        }else if(this.x > 1200 - this.w){
             this.x = 1200 - this.w
-    }
+        }
 
-    this.velY += this.gravidade
-    this.y += this.velY
+        this.velY += this.gravidade
+        this.y += this.velY
 
-    // chão
-    if(this.y >= chao - this.h){
-        this.y = chao - this.h
-        this.velY = 0
-        this.pulando = false
+        if(this.y >= chao - this.h){
+            this.y = chao - this.h
+            this.velY = 0
+            this.pulando = false
 
-        // 🔥 PARA o som do pulo aqui
-        somPulo.pause()
-        somPulo.currentTime = 0
-    }
+            somPulo.pause()
+            somPulo.currentTime = 0
+        }
     }
 
     colid(objeto){
-        if((this.x < objeto.x + objeto.w)&&
-          (this.x + this.w > objeto.x)&&
-          (this.y < objeto.y + objeto.h)&&
-          (this.y + this.h > objeto.y)){
-            return true
-        }else{
-            return false
-        }
+        return (
+            this.x < objeto.x + objeto.w &&
+            this.x + this.w > objeto.x &&
+            this.y < objeto.y + objeto.h &&
+            this.y + this.h > objeto.y
+        )
     }
 
     point(objeto){
-        if(objeto.x <= -100){
-            return true
-        }else{
-            return false
-        }
+        return objeto.x <= -100
     }
 
     anim(nome, maxFrames){
-        this.tempo += 1
-    
-        if(this.tempo > 12){
-            this.tempo = 0
-            this.frame += 1
-        }
-    
-        if(this.frame > maxFrames){
-            this.frame = 1
-        }
-    
-        this.a = "./imgs/" + nome + this.frame + ".png"
-        this.img.src = this.a
+    this.tempo += 1
+
+    if(this.tempo > 12){
+        this.tempo = 0
+        this.frame += 1
     }
+
+    if(this.frame > maxFrames){
+        this.frame = 1
+    }
+
+    // 🔥 AJUSTE PRO SEU PADRÃO DE ARQUIVO
+    if(this.tipo === "M"){
+        this.a = "./imgs/" + nome + this.frame + ".png"
+    }else{
+        this.a = "./imgs/" + nome + this.frame + "_F.png"
+    }
+
+    this.img.src = this.a
+}
 
     atualizaAnimacao(){
 
-        // 🔥 PARADO
-        if(this.velX === 0 && !this.pulando){
-            this.frame = 1
+    // 🔥 PARADO
+    if(this.velX === 0 && !this.pulando){
+        this.frame = 1
+
+        if(this.tipo === "M"){
             this.a = "./imgs/skatista_parado.png"
-            this.img.src = this.a
+        }else{
+            this.a = "./imgs/skatista_parado_F.png"
         }
-    
-        // 🔥 ANDANDO (3 frames)
-        else if(this.velX !== 0 && !this.pulando){
-            this.anim("animacao_andando_", 3)
-        }
-    
-        // 🔥 PULANDO (4 frames)
-        else if(this.velY < 0){
-            this.anim("animacao_pulando_", 4)
-        }
-    
-        // 🔥 CAINDO (2 frames)
-        else if(this.velY > 0){
-            this.anim("animacao_caindo_", 2)
-        }
+
+        this.img.src = this.a
     }
+
+    // 🔥 ANDANDO
+    else if(this.velX !== 0 && !this.pulando){
+        this.anim("animacao_andando_", 3)
+    }
+
+    // 🔥 PULANDO
+    else if(this.velY < 0){
+        this.anim("animacao_pulando_", 4)
+    }
+
+    // 🔥 CAINDO
+    else if(this.velY > 0){
+        this.anim("animacao_caindo_", 2)
+    }
+}
 }
 
 class Inimigos extends Obj{
@@ -145,6 +153,9 @@ class Inimigos extends Obj{
     }
 
     desenha(){
+        des.fillStyle = "red"
+        des.fillRect(100,100,100,100)
+
         if(this.ativo){
             this.des_carro()
         }
