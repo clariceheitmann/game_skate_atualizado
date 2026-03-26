@@ -164,23 +164,19 @@ class Inimigos extends Obj{
 }
 
 class Text{
-    des_text(text, x, y, cor, font){
-        des.font = font
-    
-        // 🔥 SOMBRA NEON
-        des.shadowColor = cor
-        des.shadowBlur = 15
-    
-        // 🔥 CONTORNO (grafite)
-        des.lineWidth = 4
-        des.strokeStyle = 'black'
-        des.strokeText(text, x, y)
-    
-        // 🔥 TEXTO PRINCIPAL
-        des.fillStyle = cor
-        des.fillText(text, x, y)
-    
-        // 🔥 RESET sombra (IMPORTANTE)
-        des.shadowBlur = 0
+    des_text(text, x, y, cor, font, contorno = 'black'){
+    des.font = font
+
+    des.shadowColor = cor
+    des.shadowBlur = 15
+
+    des.lineWidth = 4
+    des.strokeStyle = contorno
+    des.strokeText(text, x, y)
+
+    des.fillStyle = cor
+    des.fillText(text, x, y)
+
+    des.shadowBlur = 0
     }
 }

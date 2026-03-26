@@ -5,13 +5,18 @@ console.log(canvas)
 let des = canvas.getContext('2d')
 console.log(des)
 
-//=================
 
 let fundo = new Image()
 fundo.src = './imgs/fundo1.png'
 
 let imgGameOver = new Image()
 imgGameOver.src = './imgs/game_over.png'
+
+let imgP1Win = new Image()
+imgP1Win.src = './imgs/player_1_win.png'
+
+let imgP2Win = new Image()
+imgP2Win.src = './imgs/player_2_win.png'
 
 let chao = 600
 
@@ -311,6 +316,12 @@ function desenhaEscolha(){
 // DESENHA
 function desenha() {
 
+    const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
+
+    fonte.load().then(function(font){
+    document.fonts.add(font);
+});
+
     if (estado === "menu"){
         desenhaMenu()
         return
@@ -356,20 +367,91 @@ function desenha() {
 
     } else {
 
-        // 🔥 IMAGEM GAME OVER
-        if(modo === "single"){
-            if(imgGameOver.complete){
-                des.drawImage(imgGameOver, 200, 100, 800, 500)
+    // 🔥 DESFOCA O FUNDO
+    des.filter = "blur(5px)"
+    if (fundo.complete) {
+        des.drawImage(fundo, 0, 0, 1200, 700)
+    }
+    des.filter = "none"
+
+    // 🔥 CAMADA ESCURA
+    des.fillStyle = "rgba(0,0,0,0.5)"
+    des.fillRect(0, 0, 1200, 700)
+
+    // =========================
+    // 🔥 SINGLEPLAYER
+    // =========================
+    if(modo === "single"){
+
+        let larguraImg = 500
+        let alturaImg = 500
+
+        let xCentro = (1200 / 2) - (larguraImg / 2)
+        let yCentro = 80
+
+        if(imgGameOver.complete){
+            des.drawImage(imgGameOver, xCentro, yCentro, larguraImg, alturaImg)
+        }
+
+        des.textAlign = "center"
+
+        t1.des_text(
+            'Pontuação final: ' + playerAtual.pontos,
+            1200/2,
+            yCentro + alturaImg - 20,
+            '#000000',
+            '25px QuinqueFive',
+            '#ffdae7'
+        )
+
+        des.textAlign = "start"
+    }
+
+    // =========================
+    // 🔥 MULTIPLAYER
+    // =========================
+    else if(modo === "multi"){
+
+        let larguraImg = 500
+        let alturaImg = 400
+
+        let xCentro = (1200 / 2) - (larguraImg / 2)
+        let yCentro = 120
+
+        // 🔥 IMAGENS DE VITÓRIA
+            if(imgP1Win.complete){
+                des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
             }
-    
-            // 🔥 PONTUAÇÃO FINAL
-            t1.des_text(
-                'PONTUAÇÃO FINAL: ' + playerAtual.pontos,
-                350,
-                650,
-                '#FFFFFF',
-                '40px Impact'
-            )
+        
+            if(imgP2Win.complete){
+                des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
+            }
+        
+
+        // 🔥 TEXTO CENTRALIZADO
+        des.textAlign = "center"
+
+
+        // 🔥 PONTUAÇÃO DOS DOIS (ESTILO IGUAL AO SINGLE)
+    t1.des_text(
+        'Pontuacao Player 1: ' + skatistaM.pontos,
+        1200/2,
+        yCentro + alturaImg + 80,
+        '#000000',
+        '25px QuinqueFive',
+        '#ffdae7'
+)
+
+    t1.des_text(
+        'Pontuacao Player 2: ' + skatistaF.pontos,
+        1200/2,
+        yCentro + alturaImg + 120,
+        '#000000',
+        '25px QuinqueFive',
+        '#ffdae7'
+)
+
+        des.textAlign = "start"
         }
     }
 }
