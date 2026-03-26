@@ -11,7 +11,9 @@ class Obj{
     }
 
     des_carro(){
-        des.drawImage(this.img, this.x, this.y, this.w, this.h)
+        if(this.img.complete && this.img.naturalWidth !== 0){
+            des.drawImage(this.img, this.x, this.y, this.w, this.h)
+        }
     }
 
     des_quad(){
@@ -77,26 +79,25 @@ class GarotoSkatista extends Obj{
     }
 
     anim(nome, maxFrames){
-    this.tempo += 1
-
-    if(this.tempo > 12){
-        this.tempo = 0
-        this.frame += 1
+        this.tempo += 1
+    
+        if(this.tempo > 12){
+            this.tempo = 0
+            this.frame += 1
+        }
+    
+        if(this.frame > maxFrames){
+            this.frame = 1
+        }
+    
+        if(this.tipo === "M"){
+            this.a = "./imgs/" + nome + this.frame + "_M.png"
+        }else{
+            this.a = "./imgs/" + nome + this.frame + "_F.png"
+        }
+    
+        this.img.src = this.a
     }
-
-    if(this.frame > maxFrames){
-        this.frame = 1
-    }
-
-    // 🔥 AJUSTE PRO SEU PADRÃO DE ARQUIVO
-    if(this.tipo === "M"){
-        this.a = "./imgs/" + nome + this.frame + ".png"
-    }else{
-        this.a = "./imgs/" + nome + this.frame + "_F.png"
-    }
-
-    this.img.src = this.a
-}
 
     atualizaAnimacao(){
 
@@ -105,7 +106,7 @@ class GarotoSkatista extends Obj{
         this.frame = 1
 
         if(this.tipo === "M"){
-            this.a = "./imgs/skatista_parado.png"
+            this.a = "./imgs/skatista_parado_M.png"
         }else{
             this.a = "./imgs/skatista_parado_F.png"
         }

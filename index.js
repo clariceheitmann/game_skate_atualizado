@@ -10,6 +10,9 @@ console.log(des)
 let fundo = new Image()
 fundo.src = './imgs/fundo1.png'
 
+let imgGameOver = new Image()
+imgGameOver.src = './imgs/game_over.png'
+
 let chao = 600
 
 let cascaBanana = new Inimigos(0, 0, 60, 40, './imgs/cascaBanana.png')
@@ -19,8 +22,8 @@ let lixo = new Inimigos(0, 0, 80, 70, './imgs/lixo.png')
 
 let inimigos = [cascaBanana, coneTransito, hidrante, lixo]
 
-let skatistaM = new GarotoSkatista(100, 180, 180, 160, './imgs/animacao_skatista_1_M.png', "M")
-let skatistaF = new GarotoSkatista(300, 180, 180, 160, './imgs/animacao_skatista_1_F.png', "F")
+let skatistaM = new GarotoSkatista(100, 180, 180, 160, './imgs/skatista_parado_M.png', "M")
+let skatistaF = new GarotoSkatista(300, 180, 180, 160, './imgs/skatista_parado_F.png', "F")
 
 // 🔥 PLAYER ATUAL (singleplayer)
 let playerAtual = skatistaM
@@ -308,8 +311,6 @@ function desenhaEscolha(){
 // DESENHA
 function desenha() {
 
-    
-
     if (estado === "menu"){
         desenhaMenu()
         return
@@ -354,7 +355,22 @@ function desenha() {
         fase_txt.des_text('Fase: ' + fase, 550, 40, '#FFFFFF', '28px Impact')
 
     } else {
-        t1.des_text(vencedor, 350, 350, '#FF0055', '60px Impact')
+
+        // 🔥 IMAGEM GAME OVER
+        if(modo === "single"){
+            if(imgGameOver.complete){
+                des.drawImage(imgGameOver, 200, 100, 800, 500)
+            }
+    
+            // 🔥 PONTUAÇÃO FINAL
+            t1.des_text(
+                'PONTUAÇÃO FINAL: ' + playerAtual.pontos,
+                350,
+                650,
+                '#FFFFFF',
+                '40px Impact'
+            )
+        }
     }
 }
 
