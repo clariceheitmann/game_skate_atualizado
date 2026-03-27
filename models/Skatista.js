@@ -75,8 +75,8 @@ class GarotoSkatista extends Obj{
     }
 
     point(objeto){
-        return objeto.x <= -100
-    }
+    return this.x > objeto.x + objeto.w
+}
 
     anim(nome, maxFrames){
         this.tempo += 1
@@ -135,23 +135,32 @@ class Inimigos extends Obj{
 
     vel = 6
 
-    ativo = false // 🔥 controla se está ativo
+    ativo = false
+    pontuado = false // 🔥 NOVO
+    passouTela = false
 
     recomeca(){
-        this.x = 1300 + Math.random() * 800
-        this.y = chao - this.h
-        this.ativo = true
-    }
+    this.x = 1300 + Math.random() * 800
+    this.y = chao - this.h
+    this.ativo = true
+    this.pontuado = false
+    this.passouTela = false // 👈 novo
+}
 
     mov_car(){
-        if(!this.ativo) return
+    if(!this.ativo) return
 
-        this.x -= this.vel
+    this.x -= this.vel
 
-        if(this.x <= -200){            
-            this.ativo = false
-        }
+    // 🔥 quando entra na tela
+    if(this.x < 1200){
+        this.passouTela = true
     }
+
+    if(this.x <= -200){            
+        this.ativo = false
+    }
+}
 
     desenha(){
         des.fillStyle = "red"

@@ -5,9 +5,19 @@ console.log(canvas)
 let des = canvas.getContext('2d')
 console.log(des)
 
+let fundo1 = new Image()
+fundo1.src = './imgs/fundo1.png'
 
-let fundo = new Image()
-fundo.src = './imgs/fundo1.png'
+let fundo2 = new Image()
+fundo2.src = './imgs/fundo2.png'
+
+let fundo3 = new Image()
+fundo3.src = './imgs/fundo3.png'
+
+let fundo4 = new Image()
+fundo4.src = './imgs/fundo4.png'
+
+let fundo = fundo1
 
 let imgGameOver = new Image()
 imgGameOver.src = './imgs/game_over.png'
@@ -47,6 +57,7 @@ let somAndar = new Audio('./imgs/som_skate_andando.mp3')
 let somPulo = new Audio('./imgs/som_skate_pulando.mp3')
 let somBatida = new Audio('./imgs/metal_pipe.mp3')
 let somGameOver = new Audio('./imgs/som_gameover.mp3')
+let somVitoria = new Audio('./imgs/som_vitoria.mp3')
 
 somAndar.loop = true
 somAndar.volume = 0.3
@@ -54,6 +65,7 @@ somAndar.volume = 0.3
 somPulo.volume = 0.3
 somBatida.volume = 0.4
 somGameOver.volume = 0.6
+somVitoria.volume = 0.4
 
 let jogar = true
 let fase = 1
@@ -144,6 +156,10 @@ document.addEventListener('click', (e) => {
     let x = e.offsetX
     let y = e.offsetY
 
+    if(!jogar){
+    location.reload()
+}
+
     // MENU
     if(estado === "menu"){
 
@@ -161,8 +177,12 @@ document.addEventListener('click', (e) => {
         }
     }
 
-    // ESCOLHA PERSONAGEM
+
     else if(estado === "menu_personagem"){
+
+        if(x > 40 && x < 150 && y > 20 && y < 60){
+        estado = "menu"
+        }
 
         if(x > 450 && x < 750 && y > 320 && y < 370){
             playerAtual = skatistaM
@@ -194,7 +214,7 @@ function spawnInimigo(){
             })
 
             if(podeSpawnar){
-                let aleatorio = inativos[Math.floor(Math.random()*inimigos.length)]
+                let aleatorio = inativos[Math.floor(Math.random() * inativos.length)]
                 aleatorio.recomeca()
             }
         }
@@ -226,9 +246,26 @@ function game_over() {
     }
 
     if(!jogar){
-        somAndar.pause()
-        somGameOver.currentTime = 0
-        somGameOver.play()
+
+    // 🔥 PARA SOM DE ANDAR
+    somAndar.pause()
+    somAndar.currentTime = 0
+
+    // 🔥 SINGLEPLAYER (DERROTA)
+    if(modo === "single"){
+        if(somGameOver.paused){
+            somGameOver.currentTime = 0
+            somGameOver.play()
+        }
+    }
+
+    // 🔥 MULTIPLAYER (VITÓRIA)
+    if(modo === "multi"){
+        if(somVitoria.paused){
+            somVitoria.currentTime = 0
+            somVitoria.play()
+            }
+        }
     }
 }
 
@@ -236,23 +273,23 @@ function ver_fase() {
     let pontosRef = (modo === "single") ? playerAtual.pontos : skatistaM.pontos
 
     if (pontosRef > 20 && fase === 1) {
-        fase = 2
-        maxInimigos = 2
-        inimigos.forEach(i => i.vel = 8)
-        fundo.src = './imgs/fundo2.png'
-    }
-    else if (pontosRef > 50 && fase === 2) {
-        fase = 3
-        maxInimigos = 3
-        inimigos.forEach(i => i.vel = 10)
-        fundo.src = './imgs/fundo3.png'
-    }
-    else if (pontosRef > 80 && fase === 3) {
-        fase = 4
-        maxInimigos = 4
-        inimigos.forEach(i => i.vel = 12)
-        fundo.src = './imgs/fundo4.png'
-    }
+    fase = 2
+    maxInimigos = 2
+    inimigos.forEach(i => i.vel = 8)
+    fundo = fundo2
+}
+else if (pontosRef > 50 && fase === 2) {
+    fase = 3
+    maxInimigos = 3
+    inimigos.forEach(i => i.vel = 10)
+    fundo = fundo3
+}
+else if (pontosRef > 80 && fase === 3) {
+    fase = 4
+    maxInimigos = 4
+    inimigos.forEach(i => i.vel = 12)
+    fundo = fundo4
+}
 }
 
 function colisao() {
@@ -274,14 +311,21 @@ function colisao() {
 
 function pontuacao() {
     inimigos.forEach(i => {
-        if(i.ativo && skatistaM.point(i)){
-            skatistaM.pontos += 5
-            i.ativo = false
-        }
 
-        if(i.ativo && skatistaF.point(i)){
-            skatistaF.pontos += 5
-            i.ativo = false
+        if(i.ativo && !i.pontuado){
+
+            // PLAYER M
+            if(skatistaM.x > i.x + i.w){
+                skatistaM.pontos += 5
+                i.pontuado = true
+            }
+
+            // PLAYER F
+            if(skatistaF.x > i.x + i.w){
+                skatistaF.pontos += 5
+                i.pontuado = true
+            }
+
         }
     })
 }
@@ -332,6 +376,10 @@ function desenha() {
 
     if (estado === "menu_personagem"){
         desenhaEscolha()
+        // 🔥 BOTÃO VOLTAR
+        des.fillStyle = "#FFFFFF"
+        des.font = "25px Impact"
+        des.fillText("← Voltar", 50, 50)
         return
     }
 
@@ -348,27 +396,30 @@ function desenha() {
         if(modo === "single"){
             playerAtual.des_carro()
 
-            t1.des_text('Pontos: ' + playerAtual.pontos, 1000, 40, '#FFFFFF', '28px Impact')
-            t2.des_text('Vidas: ' + playerAtual.vida, 40, 40, '#FFFFFF', '28px Impact')
+            t1.des_text('Pontos: ' + playerAtual.pontos, 1000, 40, '#000000', '16px QuinqueFive', '#ffdae7')
+            t2.des_text('Vidas: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
         }
 
         if(modo === "multi"){
             skatistaM.des_carro()
             skatistaF.des_carro()
 
-            t1.des_text('P1: ' + skatistaM.pontos, 900, 40, '#00FFFF', '24px Impact')
-            t2.des_text('P1 Vida: ' + skatistaM.vida, 40, 40, '#00FFFF', '24px Impact')
+            t1.des_text('P1: ' + skatistaM.pontos, 900, 40, '#000000', '16px QuinqueFive', '#a2b8e6')
+            t2.des_text('P1 Vida: ' + skatistaM.vida, 40, 40, '#000000', '16px QuinqueFive', '#a2b8e6')
 
-            t1.des_text('P2: ' + skatistaF.pontos, 900, 80, '#FF00AA', '24px Impact')
-            t2.des_text('P2 Vida: ' + skatistaF.vida, 40, 80, '#FF00AA', '24px Impact')
+            t1.des_text('P2: ' + skatistaF.pontos, 900, 80, '#000000', '16px QuinqueFive', '#dea5e6')
+            t2.des_text('P2 Vida: ' + skatistaF.vida, 40, 80, '#000000', '16px QuinqueFive', '#dea5e6')
         }
 
-        fase_txt.des_text('Fase: ' + fase, 550, 40, '#FFFFFF', '28px Impact')
+        fase_txt.des_text('Fase: ' + fase, 550, 40, '#000000', '16px QuinqueFive', '#ffdae7')
 
     } else {
 
     // 🔥 DESFOCA O FUNDO
-    des.filter = "blur(5px)"
+    des.filter = "blur(8px) brightness(0.6)"
+    des.fillStyle = "rgba(0, 0, 0, 0.7)"
+    des.fillRect(300, 80, 600, 540)
+
     if (fundo.complete) {
         des.drawImage(fundo, 0, 0, 1200, 700)
     }
@@ -396,13 +447,22 @@ function desenha() {
         des.textAlign = "center"
 
         t1.des_text(
-            'Pontuação final: ' + playerAtual.pontos,
+            'Pontos: ' + playerAtual.pontos,
             1200/2,
             yCentro + alturaImg - 20,
             '#000000',
             '25px QuinqueFive',
             '#ffdae7'
         )
+
+        t1.des_text(
+            'Tentar outra vez',
+            1200/2,
+            600,
+            '#000000',
+            '16px QuinqueFive',
+            '#ffdae7'
+)
 
         des.textAlign = "start"
     }
@@ -419,36 +479,46 @@ function desenha() {
         let yCentro = 120
 
         // 🔥 IMAGENS DE VITÓRIA
-            if(imgP1Win.complete){
-                des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
-            }
-        
-            if(imgP2Win.complete){
-                des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
-            }
-        
+    if(vencedor === "PLAYER M VENCEU!"){
+    if(imgP1Win.complete){
+        des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
+    }
+}
 
-        // 🔥 TEXTO CENTRALIZADO
+    if(vencedor === "PLAYER F VENCEU!"){
+    if(imgP2Win.complete){
+        des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
+    }
+}
+        
         des.textAlign = "center"
-
 
         // 🔥 PONTUAÇÃO DOS DOIS (ESTILO IGUAL AO SINGLE)
     t1.des_text(
-        'Pontuacao Player 1: ' + skatistaM.pontos,
-        1200/2,
-        yCentro + alturaImg + 80,
-        '#000000',
-        '25px QuinqueFive',
-        '#ffdae7'
+    'Pontos player 1: ' + skatistaM.pontos,
+    1200/2,
+    yCentro + alturaImg + 60,
+    '#000000',
+    '22px QuinqueFive',
+    '#ffdae7'
 )
 
     t1.des_text(
-        'Pontuacao Player 2: ' + skatistaF.pontos,
-        1200/2,
-        yCentro + alturaImg + 120,
-        '#000000',
-        '25px QuinqueFive',
-        '#ffdae7'
+    'Pontos player 2: ' + skatistaF.pontos,
+    1200/2,
+    yCentro + alturaImg + 100,
+    '#000000',
+    '22px QuinqueFive',
+    '#ffdae7'
+)
+
+    t1.des_text(
+    'Tentar outra vez',
+    1200/2,
+    680,
+    '#000000',
+    '16px QuinqueFive',
+    '#ffdae7'
 )
 
         des.textAlign = "start"
