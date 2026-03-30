@@ -27,7 +27,7 @@ class GarotoSkatista extends Obj{
     constructor(x,y,w,h,a, tipo="M"){
         super(x,y,w,h,a)
 
-        this.tipo = tipo // 🔥 M ou F
+        this.tipo = tipo 
 
         this.dir = 0
         this.vida = 5
@@ -101,7 +101,6 @@ class GarotoSkatista extends Obj{
 
     atualizaAnimacao(){
 
-    // 🔥 PARADO
     if(this.velX === 0 && !this.pulando){
         this.frame = 1
 
@@ -114,17 +113,14 @@ class GarotoSkatista extends Obj{
         this.img.src = this.a
     }
 
-    // 🔥 ANDANDO
     else if(this.velX !== 0 && !this.pulando){
         this.anim("animacao_andando_", 3)
     }
 
-    // 🔥 PULANDO
     else if(this.velY < 0){
         this.anim("animacao_pulando_", 4)
     }
 
-    // 🔥 CAINDO
     else if(this.velY > 0){
         this.anim("animacao_caindo_", 2)
     }
@@ -136,7 +132,7 @@ class Inimigos extends Obj{
     vel = 6
 
     ativo = false
-    pontuado = false // 🔥 NOVO
+    pontuado = false 
     passouTela = false
 
     recomeca(){
@@ -144,7 +140,7 @@ class Inimigos extends Obj{
     this.y = chao - this.h
     this.ativo = true
     this.pontuado = false
-    this.passouTela = false // 👈 novo
+    this.passouTela = false 
 }
 
     mov_car(){
@@ -152,7 +148,6 @@ class Inimigos extends Obj{
 
     this.x -= this.vel
 
-    // 🔥 quando entra na tela
     if(this.x < 1200){
         this.passouTela = true
     }
@@ -177,7 +172,7 @@ class Text{
     des.font = font
 
     des.shadowColor = cor
-    des.shadowBlur = 15
+    des.shadowBlur = 5
 
     des.lineWidth = 4
     des.strokeStyle = contorno
