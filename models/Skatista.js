@@ -8,6 +8,8 @@ class Obj{
 
         this.img = new Image()
         this.img.src = this.a
+
+        this.imagens = {}
     }
 
     des_carro(){
@@ -79,25 +81,33 @@ class GarotoSkatista extends Obj{
 }
 
     anim(nome, maxFrames){
-        this.tempo += 1
-    
-        if(this.tempo > 12){
-            this.tempo = 0
-            this.frame += 1
-        }
-    
-        if(this.frame > maxFrames){
-            this.frame = 1
-        }
-    
-        if(this.tipo === "M"){
-            this.a = "./imgs/" + nome + this.frame + "_M.png"
-        }else{
-            this.a = "./imgs/" + nome + this.frame + "_F.png"
-        }
-    
-        this.img.src = this.a
+    this.tempo += 1
+
+    if(this.tempo > 12){
+        this.tempo = 0
+        this.frame += 1
     }
+
+    if(this.frame > maxFrames){
+        this.frame = 1
+    }
+
+    let caminho = ""
+
+    if(this.tipo === "M"){
+        caminho = "./imgs/" + nome + this.frame + "_M.png"
+    }else{
+        caminho = "./imgs/" + nome + this.frame + "_F.png"
+    }
+
+    if(!this.imagens[caminho]){
+        let img = new Image()
+        img.src = caminho
+        this.imagens[caminho] = img
+    }
+
+    this.img = this.imagens[caminho]
+}
 
     atualizaAnimacao(){
 
@@ -110,7 +120,13 @@ class GarotoSkatista extends Obj{
             this.a = "./imgs/skatista_parado_F.png"
         }
 
-        this.img.src = this.a
+        if(!this.imagens[this.a]){
+        let img = new Image()
+        img.src = this.a
+        this.imagens[this.a] = img
+}
+
+this.img = this.imagens[this.a]
     }
 
     else if(this.velX !== 0 && !this.pulando){
@@ -163,6 +179,31 @@ class Inimigos extends Obj{
 
         if(this.ativo){
             this.des_carro()
+        }
+    }
+}
+
+class Coracao extends Obj {
+
+    constructor(x,y,w,h,a){
+        super(x,y,w,h,a)
+        this.ativo = false
+        this.vel = 6
+    }
+
+    spawn(){
+        this.x = 1300
+        this.y = 300 // 🔥 mais alto que o chão
+        this.ativo = true
+    }
+
+    mov(){
+        if(!this.ativo) return
+
+        this.x -= this.vel
+
+        if(this.x < -100){
+            this.ativo = false
         }
     }
 }
