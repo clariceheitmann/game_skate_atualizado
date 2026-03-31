@@ -16,7 +16,13 @@ fundo3.src = './imgs/fundo3.png'
 let fundo4 = new Image()
 fundo4.src = './imgs/fundo4.png'
 
+let fundo5 = new Image()
+fundo5.src = './imgs/fundo5.png'
+
 let fundo = fundo1
+
+let imgWin = new Image()
+imgWin.src = './imgs/trofeu.png'
 
 let imgGameOver = new Image()
 imgGameOver.src = './imgs/game_over.png'
@@ -32,12 +38,13 @@ imgP2Win.src = './imgs/player_2_win.png'
 
 let chao = 600
 
-let cascaBanana = new Inimigos(0, 0, 60, 40, './imgs/cascaBanana.png')
-let coneTransito = new Inimigos(0, 0, 70, 80, './imgs/coneTransito.png')
-let hidrante = new Inimigos(0, 0, 80, 90, './imgs/hidrante.png')
-let lixo = new Inimigos(0, 0, 80, 70, './imgs/lixo.png')
+let cascaBanana = new Inimigos(0, 0, 70, 50, './imgs/cascaBanana.png')
+let coneTransito = new Inimigos(0, 0, 90, 90, './imgs/coneTransito.png')
+let hidrante = new Inimigos(0, 0, 100, 100, './imgs/hidrante.png')
+let lixo = new Inimigos(0, 0, 105, 95, './imgs/lixo.png')
+let carrinho = new Inimigos(0, 0, 130, 130, './imgs/carrinho.png' )
 
-let inimigos = [cascaBanana, coneTransito, hidrante, lixo]
+let inimigos = [cascaBanana, coneTransito, hidrante, lixo, carrinho]
 
 let skatistaM = new GarotoSkatista(100, 180, 180, 160, './imgs/skatista_parado_M.png', "M")
 let skatistaF = new GarotoSkatista(300, 180, 180, 160, './imgs/skatista_parado_F.png', "F")
@@ -49,23 +56,27 @@ let t2 = new Text()
 let fase_txt = new Text()
 
 let botaoComoJogar = {}
+let botaoSobre = {}
 
 let estado = "menu"
 let modo = ""
 let personagemEscolhido = "M"
 
+let musicaFundo = new Audio('./imgs/musica_fundo.mp3')
 let somAndar = new Audio('./imgs/som_skate_andando.mp3')
 let somPulo = new Audio('./imgs/som_skate_pulando.mp3')
 let somBatida = new Audio('./imgs/metal_pipe.mp3')
 let somGameOver = new Audio('./imgs/som_gameover.mp3')
 let somVitoria = new Audio('./imgs/som_vitoria.mp3')
 
+musicaFundo.loop = true
 somAndar.loop = true
-somAndar.volume = 0.3
 
+musicaFundo.volume = 0.05
+somAndar.volume = 0.3
 somPulo.volume = 0.3
-somBatida.volume = 0.4
-somGameOver.volume = 0.6
+somBatida.volume = 0.2
+somGameOver.volume = 0.4
 somVitoria.volume = 0.4
 
 let jogar = true
@@ -74,144 +85,166 @@ let fase = 1
 let maxInimigos = 1
 let distanciaMinima = 400
 
+// ===================== TECLADO =====================
 document.addEventListener('keydown', (e) => {
 
-    if(estado === "menu"){
-        if(e.key === "1"){
-            modo = "single"
-            estado = "menu_personagem"
-        }
-        if(e.key === "2"){
-            modo = "multi"
-            estado = "jogo"
-
-            skatistaM.x = 100
-            skatistaF.x = 300
+    // ===== MENU PRINCIPAL =====
+    if (estado === "menu") {
+        if (e.key === "1") {
+            modo = "single";
+            estado = "menu_personagem";
         }
 
-        if(e.key === "3"){
-            estado = "como_jogar"
+        if (e.key === "2") {
+            modo = "multi";
+            estado = "jogo";
+            skatistaM.x = 100;
+            skatistaF.x = 300;
+            playerAtual = null;
         }
 
-        return
+        if (e.key === "3") { estado = "como_jogar"; }
+        if (e.key === "4") { estado = "sobre"; }
+
+        return; // 🔥 MUITO IMPORTANTE
     }
 
-    if(estado === "menu_personagem"){
-        if(e.key === "1"){
-            personagemEscolhido = "M"
-            playerAtual = skatistaM
-            estado = "jogo"
+    // ===== ESCOLHA DE PERSONAGEM =====
+    if (estado === "menu_personagem") {
+        if (e.key === "1") {
+            personagemEscolhido = "M";
+            playerAtual = skatistaM;
+            estado = "jogo";
         }
-        if(e.key === "2"){
-            personagemEscolhido = "F"
-            playerAtual = skatistaF
-            estado = "jogo"
+
+        if (e.key === "2") {
+            personagemEscolhido = "F";
+            playerAtual = skatistaF;
+            estado = "jogo";
         }
-        return
+
+        if (e.key === "Escape") {
+            estado = "menu";
+        }
+
+        return; // 🔥 MUITO IMPORTANTE
     }
 
-    if (
-        e.key === 'a' || e.key === 'd' ||
-        e.key === 'ArrowLeft' || e.key === 'ArrowRight'
-    ){
-        if (somAndar.paused) somAndar.play()
+    // ===== MOVIMENTAÇÃO =====
+    if (estado === "jogo" && jogar) {
+
+        // Player 1
+        if (e.key === 'ArrowLeft') skatistaM.velX = -5;
+        if (e.key === 'ArrowRight') skatistaM.velX = 5;
+        if (e.key === 'ArrowUp' && !skatistaM.pulando) {
+            skatistaM.velY = -18;
+            skatistaM.pulando = true;
+            somPulo.currentTime = 0;
+            somPulo.play();
+        }
+
+        // Player 2
+        if (e.key === 'a') skatistaF.velX = -5;
+        if (e.key === 'd') skatistaF.velX = 5;
+        if (e.key === 'w' && !skatistaF.pulando) {
+            skatistaF.velY = -18;
+            skatistaF.pulando = true;
+            somPulo.currentTime = 0;
+            somPulo.play();
+        }
+
+        // Som andando
+        if (['ArrowLeft','ArrowRight','a','d'].includes(e.key)) {
+            if (somAndar.paused) somAndar.play();
+        }
     }
+});
 
-    if (e.key === 'ArrowLeft') skatistaM.velX = -5
-    if (e.key === 'ArrowRight') skatistaM.velX = 5
-
-    if (e.key === 'ArrowUp' && !skatistaM.pulando) {
-        skatistaM.velY = -18
-        skatistaM.pulando = true
-        somPulo.currentTime = 0
-        somPulo.play()
-    }
-
-    if (e.key === 'a') skatistaF.velX = -5
-    if (e.key === 'd') skatistaF.velX = 5
-
-    if (e.key === 'w' && !skatistaF.pulando) {
-        skatistaF.velY = -18
-        skatistaF.pulando = true
-        somPulo.currentTime = 0
-        somPulo.play()
-    }
-})
-
+// Teclas soltas
 document.addEventListener('keyup', (e) => {
+    if (estado === "jogo") {
+        if (['ArrowLeft','ArrowRight'].includes(e.key)) skatistaM.velX = 0;
+        if (['a','d'].includes(e.key)) skatistaF.velX = 0;
 
-    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') skatistaM.velX = 0
-    if (e.key === 'a' || e.key === 'd') skatistaF.velX = 0
-
-    if (
-        e.key === 'a' || e.key === 'd' ||
-        e.key === 'ArrowLeft' || e.key === 'ArrowRight'
-    ){
-        somAndar.pause()
-        somAndar.currentTime = 0
+        if (['ArrowLeft','ArrowRight','a','d'].includes(e.key)) {
+            somAndar.pause();
+            somAndar.currentTime = 0;
+        }
     }
-})
+});
 
-
+// ===================== CLIQUE =====================
 document.addEventListener('click', (e) => {
+    let x = e.offsetX;
+    let y = e.offsetY;
 
-    let x = e.offsetX
-    let y = e.offsetY
+    if (musicaFundo.paused) musicaFundo.play();
 
-    if(!jogar){
-    location.reload()
+    // Reinicia o jogo se acabou
+    if (!jogar) { location.reload(); return; }
+
+    if (estado === "menu") {
+
+    // Singleplayer
+    if (x > 450 && x < 750 && y > 320 && y < 370) { 
+        modo = "single"; 
+        estado = "menu_personagem"; 
+        return;
+    }
+
+    // Multiplayer
+    if (x > 450 && x < 750 && y > 390 && y < 440) { 
+        modo = "multi"; 
+        estado = "jogo"; 
+        skatistaM.x = 100; 
+        skatistaF.x = 300; 
+        playerAtual = null;
+        return;
+    }
+
+    // Como jogar
+    if (x > botaoComoJogar.x && x < botaoComoJogar.x + botaoComoJogar.w &&
+        y > botaoComoJogar.y && y < botaoComoJogar.y + botaoComoJogar.h) { 
+        estado = "como_jogar"; 
+        return; // 🔥 ESSENCIAL
+    }
+
+    // Sobre
+    if (x > botaoSobre.x && x < botaoSobre.x + botaoSobre.w &&
+        y > botaoSobre.y && y < botaoSobre.y + botaoSobre.h) { 
+        estado = "sobre"; 
+        return; // 🔥 ESSENCIAL
+    }
 }
 
-    if(estado === "menu"){
-
-        if(x > 450 && x < 750 && y > 320 && y < 370){
-            modo = "single"
-            estado = "menu_personagem"
-        }
-
-        if(x > 450 && x < 750 && y > 390 && y < 440){
-            modo = "multi"
-            estado = "jogo"
-
-            skatistaM.x = 100
-            skatistaF.x = 300
-        }
-
-        if(
-            x > botaoComoJogar.x &&
-            x < botaoComoJogar.x + botaoComoJogar.w &&
-            y > botaoComoJogar.y &&
-            y < botaoComoJogar.y + botaoComoJogar.h
-        ){
-            estado = "como_jogar"
-        }
+    // ===== ESCOLHA DE PERSONAGEM (SINGLEPLAYER) =====
+    if (estado === "menu_personagem") {
+    if (x > 450 && x < 750 && y > 320 && y < 370) { 
+        personagemEscolhido = "M"; 
+        playerAtual = skatistaM; 
+        estado = "jogo"; 
+        return; // 🔥
+    }
+    else if (x > 450 && x < 750 && y > 390 && y < 440) { 
+        personagemEscolhido = "F"; 
+        playerAtual = skatistaF; 
+        estado = "jogo"; 
+        return; // 🔥
     }
 
+    else if (x > 40 && x < 150 && y > 20 && y < 60) {
+        estado = "menu";
+        return; // 🔥
+    }
+}
 
-    else if(estado === "menu_personagem"){
-
-        if(x > 40 && x < 150 && y > 20 && y < 60){
-        estado = "menu"
-        }
-
-        if(x > 450 && x < 750 && y > 320 && y < 370){
-            playerAtual = skatistaM
-            estado = "jogo"
-        }
-
-        if(x > 450 && x < 750 && y > 390 && y < 440){
-            playerAtual = skatistaF
-            estado = "jogo"
+    // ===== VOLTAR (Como Jogar / Sobre) =====
+    if (estado === "como_jogar" || estado === "sobre") {
+        if (x > 40 && x < 150 && y > 20 && y < 60) {
+            estado = "menu";
         }
     }
-
-    else if(estado === "como_jogar"){
-        if(x > 40 && x < 150 && y > 20 && y < 60){
-            estado = "menu"
-        }
-    }
-
-})
+});
 
 function spawnInimigo(){
     let ativos = inimigos.filter(i => i.ativo)
@@ -241,44 +274,62 @@ let vencedor = ""
 function game_over() {
 
     if(modo === "single"){
+
+        // 🏆 ganhou
+        if(playerAtual.pontos >= 15){
+            jogar = false
+            vencedor = "WIN"
+        }
+
+        // 💀 perdeu
         if(playerAtual.vida <= 0){
             jogar = false
-            vencedor = "GAME OVER"
+            vencedor = "LOSE"
         }
     }
 
     if(modo === "multi"){
         if(skatistaM.vida <= 0){
             jogar = false
-            vencedor = "PLAYER F VENCEU!"
         }
 
         if(skatistaF.vida <= 0){
             jogar = false
-            vencedor = "PLAYER M VENCEU!"
         }
     }
 
     if(!jogar){
 
-    somAndar.pause()
-    somAndar.currentTime = 0
+        musicaFundo.pause()
+        musicaFundo.currentTime = 0
 
-    if(modo === "single"){
-        if(somGameOver.paused){
-            somGameOver.currentTime = 0
-            somGameOver.play()
+        somAndar.pause()
+        somAndar.currentTime = 0
+
+        somPulo.pause()
+        somPulo.currentTime = 0
+
+        if(modo === "single"){
+            if(vencedor === "LOSE" && somGameOver.paused){
+                somGameOver.currentTime = 0
+                somGameOver.play()
+            }
+
+            if(vencedor === "WIN" && somVitoria.paused){
+                somVitoria.currentTime = 0
+                somVitoria.play()
+            }
         }
-    }
 
-    if(modo === "multi"){
-        if(somVitoria.paused){
-            somVitoria.currentTime = 0
-            somVitoria.play()
+        if(modo === "multi"){
+            if(somVitoria.paused){
+                somVitoria.currentTime = 0
+                somVitoria.play()
             }
         }
     }
 }
+
 
 function ver_fase() { 
     let pontosRef = (modo === "single") ? playerAtual.pontos : skatistaM.pontos
@@ -286,20 +337,26 @@ function ver_fase() {
     if (pontosRef > 20 && fase === 1) {
     fase = 2
     maxInimigos = 2
-    inimigos.forEach(i => i.vel = 8)
+    inimigos.forEach(i => i.vel = 7)
     fundo = fundo2
 }
 else if (pontosRef > 50 && fase === 2) {
     fase = 3
     maxInimigos = 3
-    inimigos.forEach(i => i.vel = 10)
+    inimigos.forEach(i => i.vel = 8)
     fundo = fundo3
 }
 else if (pontosRef > 80 && fase === 3) {
     fase = 4
-    maxInimigos = 4
-    inimigos.forEach(i => i.vel = 12)
+    maxInimigos = 3
+    inimigos.forEach(i => i.vel = 9)
     fundo = fundo4
+}
+else if (pontosRef > 110 && fase === 4) {
+    fase = 5
+    maxInimigos = 4
+    inimigos.forEach(i => i.vel = 10)
+    fundo = fundo5
 }
 }
 
@@ -340,59 +397,32 @@ function pontuacao() {
 }
 
 function desenhaMenu(){
-
     if(imgMenu.complete){
         des.drawImage(imgMenu, 0, 0, 1200, 700)
     }
 
+    botaoSobre.x = 450
+    botaoSobre.y = 540
+    botaoSobre.w = 300
+    botaoSobre.h = 40
+
     des.textAlign = "center"
 
-    t1.des_text(
-        'PIXEL SKATE',
-        600, 
-        100,   
-        '#000000',
-        '55px QuinqueFive',
-        '#ffdae7'
-    )
-    
+    t1.des_text('PIXEL SKATE', 600, 100, '#000000', '55px QuinqueFive', '#ffdae7')
+
+    des.textAlign = "start"
+
+    t1.des_text('1 - Singleplayer', 450, 350, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('2 - Multiplayer', 450, 420, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('3 - Como Jogar', 450, 490, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('4 - Sobre o Desenvolvedor', 450, 560, '#000000', '20px QuinqueFive', '#ffdae7')
+
+    // Botão "Como Jogar" (para clique)
     let larguraTexto = des.measureText('3 - Como Jogar').width
-    
-    botaoComoJogar = {
-        x: 600 - larguraTexto / 2,
-        y: 490 - 20,
-        w: larguraTexto,
-        h: 30
-    }
+    botaoComoJogar = { x: 600 - larguraTexto / 2, y: 490 - 20, w: larguraTexto, h: 30 }
 
-des.textAlign = "start"
-
-    t1.des_text(
-        '1 - Singleplayer',
-        450,
-        350,
-        '#000000',
-        '20px QuinqueFive',
-        '#ffdae7'
-    )
-    
-    t1.des_text(
-        '2 - Multiplayer',
-        450,
-        420,
-        '#000000',
-        '20px QuinqueFive',
-        '#ffdae7'
-    )
-
-    t1.des_text(
-        '3 - Como Jogar',
-        450,
-        490,
-        '#000000',
-        '20px QuinqueFive',
-        '#ffdae7'
-    )
+    // Botão "Sobre" (para clique)
+    botaoSobre = { x: 450, y: 540, w: 300, h: 40 }
 }
 
 function desenhaEscolha(){
@@ -527,6 +557,69 @@ function desenhaComoJogar(){
     )
 }
 
+function desenhaSobre(){
+
+    if(imgMenu.complete){
+        des.drawImage(imgMenu, 0, 0, 1200, 700)
+    }
+
+    // sombra por cima (igual outras telas)
+    des.fillStyle = "rgba(0,0,0,0.4)"
+    des.fillRect(0, 0, 1200, 700)
+
+    des.textAlign = "center"
+
+    // Título
+    t1.des_text(
+        'Sobre o Desenvolvedor',
+        600,
+        100,
+        '#000000',
+        '32px QuinqueFive',
+        '#ffdae7'
+    )
+
+    // Texto principal
+    t1.des_text(
+        'Desenvolvido por Clarice',
+        600,
+        250,
+        '#000000',
+        '22px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Email: clarice_h_santos@estudante.sesisenai.org.br',
+        600,
+        300,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'GitHub: github.com/clariceheitmann',
+        600,
+        350,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    // Botão voltar
+    des.textAlign = "start"
+
+    t1.des_text(
+        '← Voltar',
+        50,
+        50,
+        '#000000',
+        '16px QuinqueFive',
+        '#ffdae7'
+    )
+}
+
 function desenha() {
 
     const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
@@ -534,17 +627,22 @@ function desenha() {
         document.fonts.add(font);
     });
 
-    if (estado === "como_jogar"){
+    if(estado === "como_jogar"){
         desenhaComoJogar()
         return
     }
 
-    if (estado === "menu"){
+    if(estado === "sobre"){
+        desenhaSobre()
+        return
+    }
+
+    if(estado === "menu"){
         desenhaMenu()
         return
     }
 
-    if (estado === "menu_personagem"){
+    if(estado === "menu_personagem"){
         desenhaEscolha()
         return
     }
@@ -559,11 +657,14 @@ function desenha() {
             if(i.ativo) i.des_carro()
         })
 
-        if(modo === "single"){
-            playerAtual.des_carro()
+        if (jogar) {
+            inimigos.forEach(i => { if(i.ativo) i.des_carro() })
 
-            t1.des_text('Pontos: ' + playerAtual.pontos, 1000, 40, '#000000', '16px QuinqueFive', '#ffdae7')
-            t2.des_text('Vidas: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
+            if(modo === "single" && playerAtual){
+                playerAtual.des_carro()
+                t1.des_text('Pontos: ' + playerAtual.pontos, 900, 40, '#000000', '16px QuinqueFive', '#ffdae7')
+                t2.des_text('Vida: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
+            }
         }
 
         if(modo === "multi"){
@@ -581,134 +682,156 @@ function desenha() {
 
     } else {
 
-    des.filter = "blur(8px) brightness(0.6)"
-    des.fillStyle = "rgba(0, 0, 0, 0.7)"
-    des.fillRect(300, 80, 600, 540)
+        des.filter = "blur(8px) brightness(0.6)"
+        des.fillStyle = "rgba(0, 0, 0, 0.7)"
+        des.fillRect(300, 80, 600, 540)
 
-    if (fundo.complete) {
-        des.drawImage(fundo, 0, 0, 1200, 700)
-    }
-    des.filter = "none"
-
-    des.fillStyle = "rgba(0,0,0,0.5)"
-    des.fillRect(0, 0, 1200, 700)
-
-  
-    if(modo === "single"){
-
-        let larguraImg = 500
-        let alturaImg = 500
-
-        let xCentro = (1200 / 2) - (larguraImg / 2)
-        let yCentro = 80
-
-        if(imgGameOver.complete){
-            des.drawImage(imgGameOver, xCentro, yCentro, larguraImg, alturaImg)
+        if (fundo.complete) {
+            des.drawImage(fundo, 0, 0, 1200, 700)
         }
+        des.filter = "none"
 
-        des.textAlign = "center"
+        des.fillStyle = "rgba(0,0,0,0.5)"
+        des.fillRect(0, 0, 1200, 700)
 
-        t1.des_text(
-            'Pontos: ' + playerAtual.pontos,
-            1200/2,
-            yCentro + alturaImg - 20,
-            '#000000',
-            '25px QuinqueFive',
-            '#ffdae7'
-        )
+        // ===================== CORREÇÃO AQUI =====================
+        if(modo === "single"){
 
-        t1.des_text(
-            'Tentar outra vez',
-            1200/2,
-            600,
-            '#000000',
-            '16px QuinqueFive',
-            '#ffdae7'
-)
+            let larguraImg = 500
+            let alturaImg = 500
 
-        des.textAlign = "start"
+            let xCentro = (1200 / 2) - (larguraImg / 2)
+            let yCentro = 80
+
+            if(vencedor === "LOSE"){
+                if(imgGameOver.complete){
+                    des.drawImage(imgGameOver, xCentro, yCentro, larguraImg, alturaImg)
+                }
+            }
+
+            if(vencedor === "WIN"){
+                if(imgWin.complete){
+                    des.drawImage(imgWin, xCentro, yCentro, larguraImg, alturaImg)
+                }
+
+            if(vencedor === "WIN"){
+    if(imgWin.complete){
+        des.drawImage(imgWin, xCentro, yCentro, larguraImg, alturaImg)
     }
 
+    des.textAlign = "center"
 
-    else if(modo === "multi"){
-
-        let larguraImg = 500
-        let alturaImg = 400
-
-        let xCentro = (1200 / 2) - (larguraImg / 2)
-        let yCentro = 120
-
-    if(vencedor === "PLAYER M VENCEU!"){
-    if(imgP1Win.complete){
-        des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
-    }
+    t1.des_text(
+        //'YOU WIN!',
+        1200/2,
+        yCentro + 40, // 🔥 acima do troféu
+        '#000000',
+        '40px QuinqueFive',
+        '#ffdae7'
+    )
 }
+            }
 
-    if(vencedor === "PLAYER F VENCEU!"){
-    if(imgP2Win.complete){
-        des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
-    }
-}
-        
-        des.textAlign = "center"
+            des.textAlign = "center"
 
-    t1.des_text(
-    'Pontos player 1: ' + skatistaM.pontos,
-    1200/2,
-    yCentro + alturaImg + 60,
-    '#000000',
-    '22px QuinqueFive',
-    '#ffdae7'
-)
+            t1.des_text(
+                'Pontos: ' + playerAtual.pontos,
+                1200/2,
+                yCentro + alturaImg - 20,
+                '#000000',
+                '25px QuinqueFive',
+                '#ffdae7'
+            )
 
-    t1.des_text(
-    'Pontos player 2: ' + skatistaF.pontos,
-    1200/2,
-    yCentro + alturaImg + 100,
-    '#000000',
-    '22px QuinqueFive',
-    '#ffdae7'
-)
+            t1.des_text(
+                'Tentar outra vez',
+                1200/2,
+                600,
+                '#000000',
+                '16px QuinqueFive',
+                '#ffdae7'
+            )
 
-    t1.des_text(
-    'Tentar outra vez',
-    1200/2,
-    680,
-    '#000000',
-    '16px QuinqueFive',
-    '#ffdae7'
-)
+            des.textAlign = "start"
+        }
+        // =======================================================
 
-        des.textAlign = "start"
+        else if(modo === "multi"){
+
+            let larguraImg = 500
+            let alturaImg = 400
+
+            let xCentro = (1200 / 2) - (larguraImg / 2)
+            let yCentro = 120
+
+            if(vencedor === "PLAYER M VENCEU!"){
+                if(imgP1Win.complete){
+                    des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
+                }
+            }
+
+            if(vencedor === "PLAYER F VENCEU!"){
+                if(imgP2Win.complete){
+                    des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
+                }
+            }
+            
+            des.textAlign = "center"
+
+            t1.des_text(
+                'Pontos player 1: ' + skatistaM.pontos,
+                1200/2,
+                yCentro + alturaImg + 60,
+                '#000000',
+                '22px QuinqueFive',
+                '#ffdae7'
+            )
+
+            t1.des_text(
+                'Pontos player 2: ' + skatistaF.pontos,
+                1200/2,
+                yCentro + alturaImg + 100,
+                '#000000',
+                '22px QuinqueFive',
+                '#ffdae7'
+            )
+
+            t1.des_text(
+                'Tentar outra vez',
+                1200/2,
+                680,
+                '#000000',
+                '16px QuinqueFive',
+                '#ffdae7'
+            )
+
+            des.textAlign = "start"
         }
     }
 }
 
 function atualiza() {
-    if (jogar) {
+    if (!jogar || estado !== "jogo") return;
 
-        if(modo === "single"){
-            playerAtual.mov_car()
-            playerAtual.atualizaAnimacao()
-        }
-
-        if(modo === "multi"){
-            skatistaM.mov_car()
-            skatistaM.atualizaAnimacao()
-
-            skatistaF.mov_car()
-            skatistaF.atualizaAnimacao()
-        }
-
-        inimigos.forEach(i => i.mov_car())
-
-        spawnInimigo()
-
-        colisao()
-        pontuacao()
-        game_over()
-        ver_fase()
+    if(modo === "single"){
+        if(!playerAtual) return; // garante que playerAtual existe
+        playerAtual.mov_car()
+        playerAtual.atualizaAnimacao()
     }
+
+    if(modo === "multi"){
+        skatistaM.mov_car()
+        skatistaM.atualizaAnimacao()
+        skatistaF.mov_car()
+        skatistaF.atualizaAnimacao()
+    }
+
+    inimigos.forEach(i => i.mov_car())
+    spawnInimigo()
+    colisao()
+    pontuacao()
+    game_over()
+    ver_fase()
 }
 
 function main() {
