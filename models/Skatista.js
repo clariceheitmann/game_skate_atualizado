@@ -123,8 +123,8 @@ class GarotoSkatista extends Obj{
 
     else if(this.velY > 0){
         this.anim("animacao_caindo_", 2)
+        }
     }
-}
 }
 
 class Inimigos extends Obj{

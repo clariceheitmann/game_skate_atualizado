@@ -276,7 +276,7 @@ function game_over() {
     if(modo === "single"){
 
         // 🏆 ganhou
-        if(playerAtual.pontos >= 15){
+        if(playerAtual.pontos >= 150){
             jogar = false
             vencedor = "WIN"
         }
@@ -348,8 +348,8 @@ else if (pontosRef > 50 && fase === 2) {
 }
 else if (pontosRef > 80 && fase === 3) {
     fase = 4
-    maxInimigos = 3
-    inimigos.forEach(i => i.vel = 9)
+    maxInimigos = 4
+    inimigos.forEach(i => i.vel = 8)
     fundo = fundo4
 }
 else if (pontosRef > 110 && fase === 4) {
