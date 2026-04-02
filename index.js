@@ -220,13 +220,13 @@ document.addEventListener('click', (e) => {
 
     if (estado === "menu") {
 
-    if (x > 450 && x < 750 && y > 320 && y < 370) { 
+    if (x > 450 && x < 750 && y > 280 && y < 320) { 
         modo = "single"; 
         estado = "menu_personagem"; 
         return;
     }
 
-    if (x > 450 && x < 750 && y > 390 && y < 440) { 
+    if (x > 450 && x < 750 && y > 340 && y < 380) { 
         modo = "multi"; 
         estado = "jogo"; 
         skatistaM.x = 100; 
@@ -471,15 +471,15 @@ function desenhaMenu(){
 
     des.textAlign = "start"
 
-    t1.des_text('1 - Singleplayer', 450, 350, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('2 - Multiplayer', 450, 420, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('3 - Como Jogar', 450, 490, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('4 - Sobre o Desenvolvedor', 450, 560, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('1 - Singleplayer', 450, 300, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('2 - Multiplayer', 450, 360, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('3 - Como Jogar', 450, 420, '#000000', '20px QuinqueFive', '#ffdae7')
+    t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', '#ffdae7')
 
     let larguraTexto = des.measureText('3 - Como Jogar').width
-    botaoComoJogar = { x: 600 - larguraTexto / 2, y: 490 - 20, w: larguraTexto, h: 30 }
+    botaoComoJogar = { x: 450 - larguraTexto / 2, y: 400 - 20, w: larguraTexto, h: 30 }
 
-    botaoSobre = { x: 450, y: 540, w: 300, h: 40 }
+    botaoSobre = { x: 450, y: 460, w: 300, h: 40 }
 }
 
 function desenhaEscolha(){
