@@ -1,6 +1,11 @@
 let canvas = document.getElementById('des')
 console.log(canvas)
 
+const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
+    fonte.load().then(function(font){
+        document.fonts.add(font);
+    });
+
 let des = canvas.getContext('2d')
 console.log(des)
 
@@ -63,6 +68,17 @@ let botaoSobre = {}
 let estado = "menu"
 let modo = ""
 let personagemEscolhido = "M"
+
+let particulas = []
+let textosFlutuantes = []
+
+let pausado = false
+let contagem = 3
+let iniciou = false
+let tempoContagem = 0
+
+let mouseX = 0
+let mouseY = 0
 
 let musicaFundo = new Audio('./imgs/musica_fundo.mp3')
 let somAndar = new Audio('./imgs/som_skate_andando.mp3')
@@ -131,6 +147,9 @@ function preloadImagens(){
 
 document.addEventListener('keydown', (e) => {
 
+    if(e.key === "Escape" && estado === "jogo"){
+    pausado = !pausado
+}
     // ===== MENU PRINCIPAL =====
     if (estado === "menu") {
         if (e.key === "1") {
@@ -177,6 +196,15 @@ document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') skatistaM.velX = -5;
         if (e.key === 'ArrowRight') skatistaM.velX = 5;
         if (e.key === 'ArrowUp' && !skatistaM.pulando) {
+            for(let i=0;i<6;i++){
+            particulas.push({
+            x: skatistaM.x + skatistaM.w/2,
+            y: skatistaM.y + skatistaM.h,
+            vx: Math.random()*4-2,
+            vy: Math.random()*-3,
+            vida: 30
+    })
+}
             skatistaM.velY = -18;
             skatistaM.pulando = true;
             somPulo.currentTime = 0;
@@ -274,6 +302,11 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+document.addEventListener('mousemove', (e)=>{
+    mouseX = e.offsetX
+    mouseY = e.offsetY
+})
 
 function spawnInimigo(){
     let ativos = inimigos.filter(i => i.ativo)
@@ -403,37 +436,42 @@ else if (pontosRef > 110 && fase === 4) {
 function colisao() {
     inimigos.forEach(i => {
 
-        if(i.ativo && skatistaM.colid(i)){
+        // PLAYER M
+        if(i.ativo && skatistaM.colid(i) && skatistaM.invencivel <= 0){
             somBatida.play()
             i.ativo = false
             skatistaM.vida -= 1
+            skatistaM.invencivel = 30
         }
 
-        if(i.ativo && skatistaF.colid(i)){
+        // PLAYER F
+        if(i.ativo && skatistaF.colid(i) && skatistaF.invencivel <= 0){
             somBatida.play()
             i.ativo = false
             skatistaF.vida -= 1
+            skatistaF.invencivel = 30
         }
+
     })
 
-    // PLAYER SINGLE
-if(modo === "single" && coracao.ativo && playerAtual.colid(coracao)){
-    coracao.ativo = false
-    playerAtual.vida += 1
-}
-
-// MULTI
-if(modo === "multi"){
-    if(coracao.ativo && skatistaM.colid(coracao)){
+    // CORAÇÃO SINGLE
+    if(modo === "single" && coracao.ativo && playerAtual.colid(coracao)){
         coracao.ativo = false
-        skatistaM.vida += 1
+        playerAtual.vida += 1
     }
 
-    if(coracao.ativo && skatistaF.colid(coracao)){
-        coracao.ativo = false
-        skatistaF.vida += 1
+    // CORAÇÃO MULTI
+    if(modo === "multi"){
+        if(coracao.ativo && skatistaM.colid(coracao)){
+            coracao.ativo = false
+            skatistaM.vida += 1
+        }
+
+        if(coracao.ativo && skatistaF.colid(coracao)){
+            coracao.ativo = false
+            skatistaF.vida += 1
+        }
     }
-}
 }
 
 function pontuacao() {
@@ -443,13 +481,30 @@ function pontuacao() {
 
             if(skatistaM.x > i.x + i.w){
                 skatistaM.pontos += 5
+
+                textosFlutuantes.push({
+                x: i.x,
+                y: i.y,
+                texto: "+5",
+                cor: "#ffdae7",
+                vida: 60
+        })
                 i.pontuado = true
             }
 
             if(skatistaF.x > i.x + i.w){
-                skatistaF.pontos += 5
-                i.pontuado = true
-            }
+    skatistaF.pontos += 5
+
+    textosFlutuantes.push({
+        x: i.x,
+        y: i.y,
+        texto: "+5",
+        cor: "#ffdae7",
+        vida: 60
+    })
+
+    i.pontuado = true
+}
 
         }
     })
@@ -675,10 +730,25 @@ function desenhaSobre(){
 
 function desenha() {
 
-    const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
-    fonte.load().then(function(font){
-        document.fonts.add(font);
-    });
+if(estado === "jogo" && !iniciou){
+    tempoContagem++
+
+    if(tempoContagem % 60 === 0){
+        contagem--
+    }
+
+    if(contagem <= 0){
+        iniciou = true
+    }
+
+    // desenha fundo atrás da contagem
+    if (fundo.complete) {
+        des.drawImage(fundo, 0, 0, 1200, 700)
+    }
+
+    t1.des_text(contagem, 600, 350, "#ffffff", "60px QuinqueFive")
+    return
+}
 
     if(estado === "como_jogar"){
         desenhaComoJogar()
@@ -715,10 +785,20 @@ function desenha() {
         }
 
         if (jogar) {
+
+            if(pausado){
+    des.fillStyle = "rgba(0,0,0,0.7)"
+    des.fillRect(0,0,1200,700)
+
+    t1.des_text("PAUSADO", 500, 200, "#fff", "40px QuinqueFive")
+    t1.des_text("ESC - continuar", 500, 300, "#fff", "20px QuinqueFive")
+
+    return
+}
             inimigos.forEach(i => { if(i.ativo) i.des_carro() })
 
             if(modo === "single" && playerAtual){
-                playerAtual.des_carro()
+                playerAtual.drawComDano()
                 t1.des_text('Pontos: ' + playerAtual.pontos, 900, 40, '#000000', '16px QuinqueFive', '#ffdae7')
                 t2.des_text('Vida: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
             }
@@ -863,9 +943,20 @@ function desenha() {
             des.textAlign = "start"
         }
     }
+
+    textosFlutuantes.forEach(t=>{
+    t1.des_text(t.texto, t.x, t.y, t.cor, '16px QuinqueFive')
+
+    particulas.forEach(p=>{
+    des.fillStyle = "#ffffff"
+    des.fillRect(p.x, p.y, 4, 4)
+        })
+    })
 }
 
 function atualiza() {
+    if(pausado) return
+
     if (!jogar || estado !== "jogo") return;
 
     if(modo === "single"){
@@ -880,6 +971,22 @@ function atualiza() {
         skatistaF.mov_car()
         skatistaF.atualizaAnimacao()
     }
+
+    textosFlutuantes.forEach(t=>{
+    t.y -= 1
+    t.vida--
+})
+textosFlutuantes = textosFlutuantes.filter(t=>t.vida>0)
+
+particulas.forEach(p=>{
+    p.x += p.vx
+    p.y += p.vy
+    p.vy += 0.2
+    p.vida--
+})
+particulas = particulas.filter(p=>p.vida>0)
+
+
 
     inimigos.forEach(i => i.mov_car())
     spawnInimigo()

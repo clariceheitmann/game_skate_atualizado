@@ -42,6 +42,9 @@ class GarotoSkatista extends Obj{
         this.velY = 0
         this.gravidade = 0.6
         this.pulando = false
+
+        // 🔥 NOVO
+        this.invencivel = 0
     }
 
     mov_car(){
@@ -76,107 +79,115 @@ class GarotoSkatista extends Obj{
         )
     }
 
-    point(objeto){
-    return this.x > objeto.x + objeto.w
-}
-
     anim(nome, maxFrames){
-    this.tempo += 1
+        this.tempo++
 
-    if(this.tempo > 12){
-        this.tempo = 0
-        this.frame += 1
+        if(this.tempo > 12){
+            this.tempo = 0
+            this.frame++
+        }
+
+        if(this.frame > maxFrames){
+            this.frame = 1
+        }
+
+        let caminho = ""
+
+        if(this.tipo === "M"){
+            caminho = "./imgs/" + nome + this.frame + "_M.png"
+        }else{
+            caminho = "./imgs/" + nome + this.frame + "_F.png"
+        }
+
+        if(!this.imagens[caminho]){
+            let img = new Image()
+            img.src = caminho
+            this.imagens[caminho] = img
+        }
+
+        this.img = this.imagens[caminho]
     }
-
-    if(this.frame > maxFrames){
-        this.frame = 1
-    }
-
-    let caminho = ""
-
-    if(this.tipo === "M"){
-        caminho = "./imgs/" + nome + this.frame + "_M.png"
-    }else{
-        caminho = "./imgs/" + nome + this.frame + "_F.png"
-    }
-
-    if(!this.imagens[caminho]){
-        let img = new Image()
-        img.src = caminho
-        this.imagens[caminho] = img
-    }
-
-    this.img = this.imagens[caminho]
-}
 
     atualizaAnimacao(){
 
-    if(this.velX === 0 && !this.pulando){
-        this.frame = 1
+        if(this.velX === 0 && !this.pulando){
+            this.frame = 1
 
-        if(this.tipo === "M"){
-            this.a = "./imgs/skatista_parado_M.png"
-        }else{
-            this.a = "./imgs/skatista_parado_F.png"
+            if(this.tipo === "M"){
+                this.a = "./imgs/skatista_parado_M.png"
+            }else{
+                this.a = "./imgs/skatista_parado_F.png"
+            }
+
+            if(!this.imagens[this.a]){
+                let img = new Image()
+                img.src = this.a
+                this.imagens[this.a] = img
+            }
+
+            this.img = this.imagens[this.a]
         }
 
-        if(!this.imagens[this.a]){
-        let img = new Image()
-        img.src = this.a
-        this.imagens[this.a] = img
-}
-
-this.img = this.imagens[this.a]
-    }
-
-    else if(this.velX !== 0 && !this.pulando){
-        this.anim("animacao_andando_", 3)
-    }
-
-    else if(this.velY < 0){
-        this.anim("animacao_pulando_", 4)
-    }
-
-    else if(this.velY > 0){
-        this.anim("animacao_caindo_", 2)
+        else if(this.velX !== 0 && !this.pulando){
+            this.anim("animacao_andando_", 3)
         }
+
+        else if(this.velY < 0){
+            this.anim("animacao_pulando_", 4)
+        }
+
+        else if(this.velY > 0){
+            this.anim("animacao_caindo_", 2)
+        }
+    }
+
+    // 🔥 NOVO MÉTODO (piscar ao tomar dano)
+    drawComDano(){
+        if(this.invencivel > 0){
+            if(Math.floor(this.invencivel / 5) % 2 === 0){
+                des.filter = "brightness(2)"
+            }
+            this.invencivel--
+        }
+
+        this.des_carro()
+        des.filter = "none"
     }
 }
 
 class Inimigos extends Obj{
 
-    vel = 6
-
-    ativo = false
-    pontuado = false 
-    passouTela = false
+    constructor(x,y,w,h,a){
+        super(x,y,w,h,a)
+        this.vel = 6
+        this.ativo = false
+        this.pontuado = false 
+        this.passouTela = false
+    }
 
     recomeca(){
-    this.x = 1300 + Math.random() * 800
-    this.y = chao - this.h
-    this.ativo = true
-    this.pontuado = false
-    this.passouTela = false 
-}
+        this.x = 1300 + Math.random() * 800
+        this.y = chao - this.h
+        this.ativo = true
+        this.pontuado = false
+        this.passouTela = false 
+    }
 
     mov_car(){
-    if(!this.ativo) return
+        if(!this.ativo) return
 
-    this.x -= this.vel
+        this.x -= this.vel
 
-    if(this.x < 1200){
-        this.passouTela = true
+        if(this.x < 1200){
+            this.passouTela = true
+        }
+
+        if(this.x <= -200){            
+            this.ativo = false
+        }
     }
-
-    if(this.x <= -200){            
-        this.ativo = false
-    }
-}
 
     desenha(){
-        des.fillStyle = "red"
-        des.fillRect(100,100,100,100)
-
         if(this.ativo){
             this.des_carro()
         }
@@ -193,7 +204,7 @@ class Coracao extends Obj {
 
     spawn(){
         this.x = 1300
-        this.y = 300 // 🔥 mais alto que o chão
+        this.y = 300
         this.ativo = true
     }
 
@@ -210,18 +221,18 @@ class Coracao extends Obj {
 
 class Text{
     des_text(text, x, y, cor, font, contorno = 'black'){
-    des.font = font
+        des.font = font
 
-    des.shadowColor = cor
-    des.shadowBlur = 5
+        des.shadowColor = cor
+        des.shadowBlur = 5
 
-    des.lineWidth = 4
-    des.strokeStyle = contorno
-    des.strokeText(text, x, y)
+        des.lineWidth = 4
+        des.strokeStyle = contorno
+        des.strokeText(text, x, y)
 
-    des.fillStyle = cor
-    des.fillText(text, x, y)
+        des.fillStyle = cor
+        des.fillText(text, x, y)
 
-    des.shadowBlur = 0
+        des.shadowBlur = 0
     }
 }
