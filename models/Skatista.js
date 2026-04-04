@@ -16,6 +16,16 @@ class Obj{
         if(this.img.complete && this.img.naturalWidth !== 0){
             des.drawImage(this.img, this.x, this.y, this.w, this.h)
         }
+
+        if(!this.ativo) return
+
+    let w = this.w * this.escala
+    let h = this.h * this.escala
+
+    let x = this.x - (w - this.w) / 2
+    let y = this.y - (h - this.h) / 2
+
+    des.drawImage(this.img, x, y, w, h)
     }
 
     des_quad(){
@@ -197,10 +207,13 @@ class Inimigos extends Obj{
 class Coracao extends Obj {
 
     constructor(x,y,w,h,a){
-        super(x,y,w,h,a)
-        this.ativo = false
-        this.vel = 6
-    }
+    super(x,y,w,h,a)
+    this.ativo = false
+    this.vel = 6
+
+    this.tempo = 0
+    this.escala = 1
+}
 
     spawn(){
         this.x = 1300
@@ -208,13 +221,19 @@ class Coracao extends Obj {
         this.ativo = true
     }
 
+    animar(){
+    this.tempo += 0.1
+    this.escala = 1 + Math.sin(this.tempo) * 0.1
+    }
+
     mov(){
-        if(!this.ativo) return
+    if(!this.ativo) return
 
-        this.x -= this.vel
+    this.x -= this.vel
+    this.animar()
 
-        if(this.x < -100){
-            this.ativo = false
+    if(this.x < -100){
+        this.ativo = false
         }
     }
 }

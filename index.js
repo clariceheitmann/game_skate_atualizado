@@ -65,12 +65,22 @@ let fase_txt = new Text()
 let botaoComoJogar = {}
 let botaoSobre = {}
 
+let botaoPause = {
+    x: 1100,
+    y: 20,
+    w: 60,
+    h: 40
+}
+
 let estado = "menu"
 let modo = ""
 let personagemEscolhido = "M"
 
 let particulas = []
 let textosFlutuantes = []
+
+let mensagemFase = ""
+let tempoMensagemFase = 0
 
 let pausado = false
 let contagem = 3
@@ -147,7 +157,7 @@ function preloadImagens(){
 
 document.addEventListener('keydown', (e) => {
 
-    if(e.key === "Escape" && estado === "jogo"){
+   if((e.key === "Escape" || e.key === " ") && estado === "jogo"){
     pausado = !pausado
 }
     // ===== MENU PRINCIPAL =====
@@ -242,9 +252,46 @@ document.addEventListener('click', (e) => {
     let x = e.offsetX;
     let y = e.offsetY;
 
+    // ===== CLIQUE NO BOTÃO PAUSE =====
+if(estado === "jogo"){
+    if(
+        x > botaoPause.x &&
+        x < botaoPause.x + botaoPause.w &&
+        y > botaoPause.y &&
+        y < botaoPause.y + botaoPause.h
+    ){
+        pausado = !pausado
+        return
+    }
+}
+
+// ===== MENU PAUSE =====
+if(pausado){
+
+    // CONTINUAR
+    if(x > 500 && x < 700 && y > 300 && y < 340){
+        pausado = false
+        return
+    }
+
+    // REINICIAR
+    if(x > 500 && x < 700 && y > 360 && y < 400){
+        reiniciarJogo()
+        return
+    }
+
+    // MENU
+    if(x > 500 && x < 700 && y > 420 && y < 460){
+        estado = "menu"
+        pausado = false
+        jogar = true
+        return
+    }
+}
+
     if (musicaFundo.paused) musicaFundo.play();
 
-    if (!jogar) { location.reload(); return; }
+    if (!jogar) { reiniciarJogo(); return; }
 
     if (estado === "menu") {
 
@@ -335,7 +382,7 @@ function spawnCoracao(){
     if(!coracao.ativo){
         let chance = Math.random()
 
-        if(chance < 0.001){ // 🔥 controla raridade
+        if(chance < 0.0002){ // 🔥 controla raridade
             coracao.spawn()
         }
     }
@@ -359,14 +406,17 @@ function game_over() {
     }
 
     if(modo === "multi"){
-        if(skatistaM.vida <= 0){
-            jogar = false
-        }
 
-        if(skatistaF.vida <= 0){
-            jogar = false
-        }
-    }
+    if(skatistaM.vida <= 0){
+    jogar = false
+    vencedor = "PLAYER 2 VENCEU!"
+}
+
+if(skatistaF.vida <= 0){
+    jogar = false
+    vencedor = "PLAYER 1 VENCEU!"
+}
+}
 
     if(!jogar){
 
@@ -409,68 +459,123 @@ function ver_fase() {
 
     if (pontosRef > 20 && fase === 1) {
     fase = 2
+    tempoMensagemFase = 120
+    mensagemFase = "FASE 2"
     maxInimigos = 2
     inimigos.forEach(i => i.vel = 7)
     fundo = fundo2
 }
+
 else if (pontosRef > 50 && fase === 2) {
     fase = 3
+    tempoMensagemFase = 120
+    mensagemFase = "FASE 3"
     maxInimigos = 3
     inimigos.forEach(i => i.vel = 8)
     fundo = fundo3
 }
+
 else if (pontosRef > 80 && fase === 3) {
-    fase = 4
+    fase = 3
+    tempoMensagemFase = 120
+    mensagemFase = "FASE 3"
     maxInimigos = 3
     inimigos.forEach(i => i.vel = 9)
     fundo = fundo4
 }
+
 else if (pontosRef > 110 && fase === 4) {
     fase = 5
+    tempoMensagemFase = 120
+    mensagemFase = "FASE 5"
     maxInimigos = 4
     inimigos.forEach(i => i.vel = 10)
     fundo = fundo5
-}
+    }
 }
 
 function colisao() {
+
+    // ===== COLISÃO COM INIMIGOS =====
     inimigos.forEach(i => {
 
-        // PLAYER M
+        // PLAYER 1 (M)
         if(i.ativo && skatistaM.colid(i) && skatistaM.invencivel <= 0){
             somBatida.play()
             i.ativo = false
             skatistaM.vida -= 1
-            skatistaM.invencivel = 30
+
+            textosFlutuantes.push({
+                x: skatistaM.x,
+                y: skatistaM.y,
+                texto: "-1 VIDA",
+                cor: "#ff4d4d",
+                vida: 60
+            })
         }
 
-        // PLAYER F
+        // PLAYER 2 (F)
         if(i.ativo && skatistaF.colid(i) && skatistaF.invencivel <= 0){
             somBatida.play()
             i.ativo = false
             skatistaF.vida -= 1
-            skatistaF.invencivel = 30
+
+            textosFlutuantes.push({
+                x: skatistaF.x,
+                y: skatistaF.y,
+                texto: "-1 VIDA",
+                cor: "#ff4d4d",
+                vida: 60
+            })
         }
 
     })
 
-    // CORAÇÃO SINGLE
+
+    // ===== CORAÇÃO SINGLEPLAYER =====
     if(modo === "single" && coracao.ativo && playerAtual.colid(coracao)){
         coracao.ativo = false
         playerAtual.vida += 1
+
+        textosFlutuantes.push({
+            x: playerAtual.x,
+            y: playerAtual.y,
+            texto: "+1 VIDA",
+            cor: "#6eff6e",
+            vida: 60
+        })
     }
 
-    // CORAÇÃO MULTI
+
+    // ===== CORAÇÃO MULTIPLAYER =====
     if(modo === "multi"){
+
         if(coracao.ativo && skatistaM.colid(coracao)){
             coracao.ativo = false
             skatistaM.vida += 1
+
+            textosFlutuantes.push({
+                x: skatistaM.x,
+                y: skatistaM.y,
+                texto: "+1 VIDA",
+                cor: "#6eff6e",
+                vida: 60
+            })
         }
 
         if(coracao.ativo && skatistaF.colid(coracao)){
             coracao.ativo = false
             skatistaF.vida += 1
+
+            textosFlutuantes.push({
+                x: skatistaF.x,
+                y: skatistaF.y,
+                texto: "+1 VIDA",
+                cor: "#6eff6e",
+                vida: 60
+            })
         }
+
     }
 }
 
@@ -526,10 +631,46 @@ function desenhaMenu(){
 
     des.textAlign = "start"
 
-    t1.des_text('1 - Singleplayer', 450, 300, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('2 - Multiplayer', 450, 360, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('3 - Como Jogar', 450, 420, '#000000', '20px QuinqueFive', '#ffdae7')
-    t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', '#ffdae7')
+    let corSingle = "#ffdae7"
+
+if(mouseX > 450 && mouseX < 750 && mouseY > 280 && mouseY < 320){
+    corSingle = "#ffffff"
+}
+
+
+
+t1.des_text('1 - Singleplayer', 450, 300, '#000000', '20px QuinqueFive', corSingle)
+
+    let corMulti = "#ffdae7"
+
+if(mouseX > 450 && mouseX < 750 && mouseY > 340 && mouseY < 380){
+    corMulti = "#ffffff"
+}
+
+t1.des_text('2 - Multiplayer', 450, 360, '#000000', '20px QuinqueFive', corMulti)
+
+
+
+    let corComo = "#ffdae7"
+
+if(mouseX > 450 && mouseX < 750 && mouseY > 400 && mouseY < 440){
+    corComo = "#ffffff"
+}
+
+t1.des_text('3 - Como Jogar', 450, 420, '#000000', '20px QuinqueFive', corComo)
+
+
+
+    let corSobre = "#ffdae7"
+
+if(mouseX > 450 && mouseX < 750 && mouseY > 460 && mouseY < 500){
+    corSobre = "#ffffff"
+}
+
+t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', corSobre)
+
+
+
 
     let larguraTexto = des.measureText('3 - Como Jogar').width
     botaoComoJogar = { x: 450 - larguraTexto / 2, y: 400 - 20, w: larguraTexto, h: 30 }
@@ -554,33 +695,41 @@ function desenhaEscolha(){
         '#ffdae7'
     )
 
-    t1.des_text(
-        '1 - Rodrick',
-        600,
-        350,
-        '#000000',
-        '22px QuinqueFive',
-        '#ffdae7'
-    )
+    let corM = "#ffdae7"
+let sizeM = "22px QuinqueFive"
 
-    t1.des_text(
-        '2 - Avril',
-        600,
-        420,
-        '#000000',
-        '22px QuinqueFive',
-        '#ffdae7'
-    )
+if(mouseX > 450 && mouseX < 750 && mouseY > 320 && mouseY < 370){
+    corM = "#ffffff"
+    sizeM = "26px QuinqueFive"
+}
+
+t1.des_text('1 - Player 1', 600, 350, '#000000', sizeM, corM)
+
+
+
+
+    let corF = "#ffdae7"
+let sizeF = "22px QuinqueFive"
+
+if(mouseX > 450 && mouseX < 750 && mouseY > 390 && mouseY < 440){
+    corF = "#ffffff"
+    sizeF = "26px QuinqueFive"
+}
+
+t1.des_text('2 - Player 2', 600, 420, '#000000', sizeF, corF)
 
     des.textAlign = "start"
-    t1.des_text(
-        '← Voltar',
-        50,
-        50,
-        '#000000',
-        '16px QuinqueFive',
-        '#ffdae7'
-    )
+
+
+    let corVoltar = "#ffdae7"
+let sizeVoltar = "16px QuinqueFive"
+
+if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    corVoltar = "#ffffff"
+    sizeVoltar = "20px QuinqueFive"
+}
+
+t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
 function desenhaComoJogar(){
@@ -659,14 +808,15 @@ function desenhaComoJogar(){
 
     des.textAlign = "start"
 
-    t1.des_text(
-        '← Voltar',
-        50,
-        50,
-        '#000000',
-        '16px QuinqueFive',
-        '#ffdae7'
-    )
+    let corVoltar = "#ffdae7"
+let sizeVoltar = "16px QuinqueFive"
+
+if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    corVoltar = "#ffffff"
+    sizeVoltar = "20px QuinqueFive"
+}
+
+t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
 function desenhaSobre(){
@@ -718,38 +868,101 @@ function desenhaSobre(){
 
     des.textAlign = "start"
 
-    t1.des_text(
-        '← Voltar',
-        50,
-        50,
-        '#000000',
-        '16px QuinqueFive',
-        '#ffdae7'
-    )
+    let corVoltar = "#ffdae7"
+let sizeVoltar = "16px QuinqueFive"
+
+if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    corVoltar = "#ffffff"
+    sizeVoltar = "20px QuinqueFive"
+}
+
+t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
+}
+
+function reiniciarJogo(){
+
+    skatistaM.invencivel = 60
+    skatistaF.invencivel = 60
+    
+    // estado do jogo
+    jogar = true
+    pausado = false
+    iniciou = false
+    contagem = 3
+    tempoContagem = 0
+
+    // fase
+    fase = 1
+    maxInimigos = 1
+    mensagemFase = ""
+    tempoMensagemFase = 0
+    fundo = fundo1
+
+    // reset players
+    skatistaM.x = 100
+    skatistaM.y = 180
+    skatistaM.vida = 5
+    skatistaM.pontos = 0
+
+    skatistaF.x = 300
+    skatistaF.y = 180
+    skatistaF.vida = 5
+    skatistaF.pontos = 0
+
+    // inimigos
+    inimigos.forEach(i => {
+        i.ativo = false
+        i.pontuado = false
+    })
+
+    // coração
+    coracao.ativo = false
+
+    // efeitos
+    particulas = []
+    textosFlutuantes = []
+
+    // som
+    musicaFundo.currentTime = 0
+    musicaFundo.play()
+
+    // volta pro jogo direto
+    estado = "jogo"
 }
 
 function desenha() {
 
-if(estado === "jogo" && !iniciou){
-    tempoContagem++
+    // ===== CONTAGEM INICIAL =====
+    if(estado === "jogo" && !iniciou){
+        tempoContagem++
 
-    if(tempoContagem % 60 === 0){
-        contagem--
+        if(tempoContagem % 90 === 0){
+            contagem--
+        }
+
+        if(contagem <= 0){
+            iniciou = true
+        }
+
+        if (fundo.complete) {
+            des.drawImage(fundo, 0, 0, 1200, 700)
+        }
+
+        t1.des_text(contagem, 600, 350, "#ffffff", "60px QuinqueFive", "#ffdae7")
+        t1.des_text(
+    contagem,
+    600,
+    350,
+    "#ffdae7", // rosa
+    "60px QuinqueFive",
+    "#000000"  // contorno preto
+)
+        return
+
+        
     }
 
-    if(contagem <= 0){
-        iniciou = true
-    }
-
-    // desenha fundo atrás da contagem
-    if (fundo.complete) {
-        des.drawImage(fundo, 0, 0, 1200, 700)
-    }
-
-    t1.des_text(contagem, 600, 350, "#ffffff", "60px QuinqueFive")
-    return
-}
-
+    // ===== TELAS =====
     if(estado === "como_jogar"){
         desenhaComoJogar()
         return
@@ -770,55 +983,100 @@ if(estado === "jogo" && !iniciou){
         return
     }
 
+    // ===== FUNDO =====
     if (fundo.complete) {
         des.drawImage(fundo, 0, 0, 1200, 700)
     }
 
+    // ===== PAUSE (ANTES DE TUDO) =====
+    if(pausado){
+    des.fillStyle = "rgba(0,0,0,0.7)"
+    des.fillRect(0,0,1200,700)
+
+    des.textAlign = "center"
+
+    t1.des_text("PAUSADO", 600, 200, "#ffdae7", "40px QuinqueFive", "#000000")
+
+    t1.des_text("Continuar", 600, 320, "#ffdae7", "20px QuinqueFive", "#000000")
+    t1.des_text("Reiniciar", 600, 380, "#ffdae7", "20px QuinqueFive", "#000000")
+    t1.des_text("Menu", 600, 440, "#ffdae7", "20px QuinqueFive", "#000000")
+
+    des.textAlign = "start"
+
+    return
+}
+
+    // ===== JOGO =====
     if (jogar) {
 
+        // ===== BOTÃO PAUSE =====
+        des.fillStyle = "#000000aa"
+        des.fillRect(botaoPause.x, botaoPause.y, botaoPause.w, botaoPause.h)
+
+        des.fillStyle = "#ffffff"
+        des.font = "20px QuinqueFive"
+        des.textAlign = "center"
+        des.fillText("II", botaoPause.x + botaoPause.w/2, botaoPause.y + 28)
+
+des.textAlign = "start"
+
+        // PARTÍCULAS
+        particulas.forEach(p => {
+            des.fillStyle = "#ffffff"
+            des.fillRect(p.x, p.y, 4, 4)
+        })
+
+        // INIMIGOS
         inimigos.forEach(i => {
             if(i.ativo) i.des_carro()
         })
 
+        // CORAÇÃO
         if(coracao.ativo){
-        coracao.des_carro()
+            coracao.des_carro()
         }
 
-        if (jogar) {
+        // PLAYER SINGLE
+        if(modo === "single" && playerAtual){
+            playerAtual.drawComDano()
 
-            if(pausado){
-    des.fillStyle = "rgba(0,0,0,0.7)"
-    des.fillRect(0,0,1200,700)
-
-    t1.des_text("PAUSADO", 500, 200, "#fff", "40px QuinqueFive")
-    t1.des_text("ESC - continuar", 500, 300, "#fff", "20px QuinqueFive")
-
-    return
-}
-            inimigos.forEach(i => { if(i.ativo) i.des_carro() })
-
-            if(modo === "single" && playerAtual){
-                playerAtual.drawComDano()
-                t1.des_text('Pontos: ' + playerAtual.pontos, 900, 40, '#000000', '16px QuinqueFive', '#ffdae7')
-                t2.des_text('Vida: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
-            }
+            t1.des_text('Pontos: ' + playerAtual.pontos, 900, 40, '#000000', '16px QuinqueFive', '#ffdae7')
+            t2.des_text('Vida: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
         }
 
+        // MULTIPLAYER
         if(modo === "multi"){
-            skatistaM.des_carro()
-            skatistaF.des_carro()
+            skatistaM.drawComDano()
+            skatistaF.drawComDano()
 
-            t1.des_text('Rodrick Pontos: ' + skatistaM.pontos, 900, 40, '#000000', '16px QuinqueFive', '#a2b8e6')
-            t2.des_text('Rodrick Vida: ' + skatistaM.vida, 40, 40, '#000000', '16px QuinqueFive', '#a2b8e6')
+            t1.des_text('P1: ' + skatistaM.pontos + ' | ❤ ' + skatistaM.vida, 40, 40, '#000', '16px QuinqueFive', '#a2b8e6')
 
-            t1.des_text('Avril Pontos: ' + skatistaF.pontos, 900, 80, '#000000', '16px QuinqueFive', '#dea5e6')
-            t2.des_text('Avril Vida: ' + skatistaF.vida, 40, 80, '#000000', '16px QuinqueFive', '#dea5e6')
+t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#000', '16px QuinqueFive', '#dea5e6')
         }
 
+        // ===== MENSAGEM DE FASE (POR CIMA) =====
+        if(tempoMensagemFase > 0){
+            des.textAlign = "center"
+
+            t1.des_text(
+                mensagemFase,
+                600,
+                200,
+                "#ffdae7",
+                "40px QuinqueFive",
+                "#000000"
+            )
+
+            des.textAlign = "start"
+        }
+
+        // HUD
         fase_txt.des_text('Fase: ' + fase, 550, 40, '#000000', '16px QuinqueFive', '#ffdae7')
 
-    } else {
+    } 
+    else {
 
+        // ===== GAME OVER =====
         des.filter = "blur(8px) brightness(0.6)"
         des.fillStyle = "rgba(0, 0, 0, 0.7)"
         des.fillRect(300, 80, 600, 540)
@@ -826,6 +1084,7 @@ if(estado === "jogo" && !iniciou){
         if (fundo.complete) {
             des.drawImage(fundo, 0, 0, 1200, 700)
         }
+
         des.filter = "none"
 
         des.fillStyle = "rgba(0,0,0,0.5)"
@@ -835,44 +1094,22 @@ if(estado === "jogo" && !iniciou){
 
             let larguraImg = 500
             let alturaImg = 500
-
             let xCentro = (1200 / 2) - (larguraImg / 2)
             let yCentro = 80
 
-            if(vencedor === "LOSE"){
-                if(imgGameOver.complete){
-                    des.drawImage(imgGameOver, xCentro, yCentro, larguraImg, alturaImg)
-                }
+            if(vencedor === "LOSE" && imgGameOver.complete){
+                des.drawImage(imgGameOver, xCentro, yCentro, larguraImg, alturaImg)
             }
 
-            if(vencedor === "WIN"){
-                if(imgWin.complete){
-                    des.drawImage(imgWin, xCentro, yCentro, larguraImg, alturaImg)
-                }
-
-            if(vencedor === "WIN"){
-    if(imgWin.complete){
-        des.drawImage(imgWin, xCentro, yCentro, larguraImg, alturaImg)
-    }
-
-    des.textAlign = "center"
-
-    t1.des_text(
-        //'YOU WIN!',
-        1200/2,
-        yCentro + 40, 
-        '#000000',
-        '40px QuinqueFive',
-        '#ffdae7'
-    )
-}
+            if(vencedor === "WIN" && imgWin.complete){
+                des.drawImage(imgWin, xCentro, yCentro, larguraImg, alturaImg)
             }
 
             des.textAlign = "center"
 
             t1.des_text(
                 'Pontos: ' + playerAtual.pontos,
-                1200/2,
+                600,
                 yCentro + alturaImg - 20,
                 '#000000',
                 '25px QuinqueFive',
@@ -881,7 +1118,7 @@ if(estado === "jogo" && !iniciou){
 
             t1.des_text(
                 'Tentar outra vez',
-                1200/2,
+                600,
                 600,
                 '#000000',
                 '16px QuinqueFive',
@@ -895,27 +1132,22 @@ if(estado === "jogo" && !iniciou){
 
             let larguraImg = 500
             let alturaImg = 400
-
             let xCentro = (1200 / 2) - (larguraImg / 2)
             let yCentro = 120
 
-            if(vencedor === "PLAYER M VENCEU!"){
-                if(imgP1Win.complete){
-                    des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
-                }
+            if(vencedor === "PLAYER 1 VENCEU!" && imgP1Win.complete){
+                des.drawImage(imgP1Win, xCentro, yCentro, larguraImg, alturaImg)
             }
 
-            if(vencedor === "PLAYER F VENCEU!"){
-                if(imgP2Win.complete){
-                    des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
-                }
+            if(vencedor === "PLAYER 2 VENCEU!" && imgP2Win.complete){
+                des.drawImage(imgP2Win, xCentro, yCentro, larguraImg, alturaImg)
             }
-            
+
             des.textAlign = "center"
 
             t1.des_text(
                 'Pontos player 1: ' + skatistaM.pontos,
-                1200/2,
+                600,
                 yCentro + alturaImg + 60,
                 '#000000',
                 '22px QuinqueFive',
@@ -924,7 +1156,7 @@ if(estado === "jogo" && !iniciou){
 
             t1.des_text(
                 'Pontos player 2: ' + skatistaF.pontos,
-                1200/2,
+                600,
                 yCentro + alturaImg + 100,
                 '#000000',
                 '22px QuinqueFive',
@@ -933,7 +1165,7 @@ if(estado === "jogo" && !iniciou){
 
             t1.des_text(
                 'Tentar outra vez',
-                1200/2,
+                600,
                 680,
                 '#000000',
                 '16px QuinqueFive',
@@ -944,18 +1176,18 @@ if(estado === "jogo" && !iniciou){
         }
     }
 
+    // ===== TEXTOS FLUTUANTES =====
     textosFlutuantes.forEach(t=>{
-    t1.des_text(t.texto, t.x, t.y, t.cor, '16px QuinqueFive')
-
-    particulas.forEach(p=>{
-    des.fillStyle = "#ffffff"
-    des.fillRect(p.x, p.y, 4, 4)
-        })
+        t1.des_text(t.texto, t.x, t.y, t.cor, '16px QuinqueFive', '#000000')
     })
 }
 
 function atualiza() {
     if(pausado) return
+
+    if(tempoMensagemFase > 0){
+    tempoMensagemFase--
+}
 
     if (!jogar || estado !== "jogo") return;
 
