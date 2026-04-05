@@ -109,6 +109,7 @@ somVitoria.volume = 0.4
 
 let jogar = true
 let fase = 1
+let faseAtualMostrada = 1
 
 let maxInimigos = 1
 let distanciaMinima = 400
@@ -382,7 +383,7 @@ function spawnCoracao(){
     if(!coracao.ativo){
         let chance = Math.random()
 
-        if(chance < 0.0002){ // 🔥 controla raridade
+        if(chance < 0.001){ // 🔥 controla raridade
             coracao.spawn()
         }
     }
@@ -457,40 +458,44 @@ if(skatistaF.vida <= 0){
 function ver_fase() { 
     let pontosRef = (modo === "single") ? playerAtual.pontos : skatistaM.pontos
 
-    if (pontosRef > 20 && fase === 1) {
-    fase = 2
-    tempoMensagemFase = 120
-    mensagemFase = "FASE 2"
-    maxInimigos = 2
-    inimigos.forEach(i => i.vel = 7)
-    fundo = fundo2
-}
+    if (pontosRef > 20 && faseAtualMostrada < 2) {
+        fase = 2
+        faseAtualMostrada = 2
+        tempoMensagemFase = 120
+        mensagemFase = "FASE 2"
+        maxInimigos = 2
+        inimigos.forEach(i => i.vel = 7)
+        fundo = fundo2
+    }
 
-else if (pontosRef > 50 && fase === 2) {
-    fase = 3
-    tempoMensagemFase = 120
-    mensagemFase = "FASE 3"
-    maxInimigos = 3
-    inimigos.forEach(i => i.vel = 8)
-    fundo = fundo3
-}
+    else if (pontosRef > 50 && faseAtualMostrada < 3) {
+        fase = 3
+        faseAtualMostrada = 3
+        tempoMensagemFase = 120
+        mensagemFase = "FASE 3"
+        maxInimigos = 2
+        inimigos.forEach(i => i.vel = 8)
+        fundo = fundo3
+    }
 
-else if (pontosRef > 80 && fase === 3) {
-    fase = 3
-    tempoMensagemFase = 120
-    mensagemFase = "FASE 3"
-    maxInimigos = 3
-    inimigos.forEach(i => i.vel = 9)
-    fundo = fundo4
-}
+    else if (pontosRef > 80 && faseAtualMostrada < 4) {
+        fase = 4
+        faseAtualMostrada = 4
+        tempoMensagemFase = 120
+        mensagemFase = "FASE 4"
+        maxInimigos = 3
+        inimigos.forEach(i => i.vel = 9)
+        fundo = fundo4
+    }
 
-else if (pontosRef > 110 && fase === 4) {
-    fase = 5
-    tempoMensagemFase = 120
-    mensagemFase = "FASE 5"
-    maxInimigos = 4
-    inimigos.forEach(i => i.vel = 10)
-    fundo = fundo5
+    else if (pontosRef > 110 && faseAtualMostrada < 5) {
+        fase = 5
+        faseAtualMostrada = 5
+        tempoMensagemFase = 120
+        mensagemFase = "FASE 5"
+        maxInimigos = 3
+        inimigos.forEach(i => i.vel = 10)
+        fundo = fundo5
     }
 }
 
@@ -673,7 +678,7 @@ t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', corSob
 
 
     let larguraTexto = des.measureText('3 - Como Jogar').width
-    botaoComoJogar = { x: 450 - larguraTexto / 2, y: 400 - 20, w: larguraTexto, h: 30 }
+    botaoComoJogar = { x: 450 - larguraTexto / 2, y: 420 - 20, w: larguraTexto, h: 30 }
 
     botaoSobre = { x: 450, y: 460, w: 300, h: 40 }
 }
@@ -762,7 +767,7 @@ function desenhaComoJogar(){
     )
 
     t1.des_text(
-        'Ganhe 5 ponto ao passar pelos inimigos!',
+        'Ganhe pontos ao ultrapassar os inimigos',
         600,
         300,
         '#000000',
@@ -771,7 +776,7 @@ function desenhaComoJogar(){
     )
 
     t1.des_text(
-        'O jogo acaba quando se perde todas as vidas',
+        'Cuidado! Cada colisao faz voce perder vida',
         600,
         350,
         '#000000',
@@ -780,7 +785,7 @@ function desenhaComoJogar(){
     )
 
     t1.des_text(
-        'Perde o jogador que primeiro morrer',
+        'Colete coracoes para recuperar vidas',
         600,
         400,
         '#000000',
@@ -789,9 +794,27 @@ function desenhaComoJogar(){
     )
 
     t1.des_text(
-        'Player 1: Setas',
+        'Sobreviva o maximo possivel e avance pelas fases!',
         600,
         450,
+        '#000000',
+        '16px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Controles:',
+        600,
+        500,
+        '#000000',
+        '16px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Player 1: Setas ← → ↑',
+        600,
+        550,
         '#000000',
         '16px QuinqueFive',
         '#a2b8e6'
@@ -800,7 +823,7 @@ function desenhaComoJogar(){
     t1.des_text(
         'Player 2: WASD',
         600,
-        490,
+        600,
         '#000000',
         '16px QuinqueFive',
         '#dea5e6'
@@ -835,21 +858,21 @@ function desenhaSobre(){
         600,
         100,
         '#000000',
-        '32px QuinqueFive',
+        '28px QuinqueFive',
         '#ffdae7'
     )
 
     t1.des_text(
         'Desenvolvido por Clarice',
         600,
-        250,
+        200,
         '#000000',
         '22px QuinqueFive',
         '#ffdae7'
     )
 
     t1.des_text(
-        'Email: clarice_h_santos@estudante.sesisenai.org.br',
+        'Este jogo foi criado como um projeto de estudo',
         600,
         300,
         '#000000',
@@ -858,9 +881,45 @@ function desenhaSobre(){
     )
 
     t1.des_text(
-        'GitHub: github.com/clariceheitmann',
+        'Foco em programacao e desenvolvimento de jogos',
         600,
         350,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'GitHub:',
+        600,
+        420,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'github.com/clariceheitmann',
+        600,
+        470,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Contato:',
+        600,
+        540,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'clarice_h_santos@estudante.sesisenai.org.br',
+        600,
+        590,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -1185,6 +1244,8 @@ t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#00
 function atualiza() {
     if(pausado) return
 
+    if(!iniciou) return
+
     if(tempoMensagemFase > 0){
     tempoMensagemFase--
 }
@@ -1203,6 +1264,9 @@ function atualiza() {
         skatistaF.mov_car()
         skatistaF.atualizaAnimacao()
     }
+
+    if(skatistaM.invencivel > 0) skatistaM.invencivel--
+    if(skatistaF.invencivel > 0) skatistaF.invencivel--
 
     textosFlutuantes.forEach(t=>{
     t.y -= 1
