@@ -22,7 +22,7 @@ O objetivo é desviar de obstáculos, coletar itens e sobreviver o maior tempo p
 ## Objetivo do Jogo
 
 * Desviar dos inimigos
-* Coletar corações para recuperar vida ❤️
+* Coletar corações para recuperar vida 
 * Acumular pontos
 * Sobreviver às fases com dificuldade crescente
 
@@ -53,7 +53,7 @@ O objetivo é desviar de obstáculos, coletar itens e sobreviver o maior tempo p
 
 * Sistema de vidas
 * Sistema de pontuação (+5 por obstáculo desviado)
-* Coletáveis (coração → +1 vida)
+* Coletáveis (coração +1 vida)
 * Progressão de fases
 * Aumento de dificuldade
 * Troca de cenário conforme a fase
@@ -67,7 +67,7 @@ O objetivo é desviar de obstáculos, coletar itens e sobreviver o maior tempo p
 * Seleção de personagem
 * Tela de jogo
 * Tela de "Como Jogar"
-* Tela "Sobre o Desenvolvedor"
+* * Tela "Sobre o Desenvolvedor" (com dados do aluno e professor)
 * Tela de vitória
 * Tela de derrota
 
@@ -75,7 +75,7 @@ O objetivo é desviar de obstáculos, coletar itens e sobreviver o maior tempo p
 
 ## Tecnologias Utilizadas
 
-* JavaScript (ES6+)
+* JavaScript
 * HTML5
 * Canvas API
 * Programação Orientada a Objetos (POO)
@@ -84,22 +84,109 @@ O objetivo é desviar de obstáculos, coletar itens e sobreviver o maior tempo p
 
 ## Requisitos do Sistema
 
-### Funcionais
+### Requisitos Funcionais 
+* Movimentação:
+O jogador pode se mover para a esquerda, direita e pular (setas ou WASD no multiplayer).
+Sistema de Vidas:
+Os jogadores começam com 5 vidas e perdem 1 ao colidir com obstáculos.
+Pontuação:
+O jogador ganha pontos ao ultrapassar inimigos durante a partida.
 
-* Movimentação do personagem
-* Sistema de vidas
-* Sistema de pontuação
-* Itens coletáveis
-* Progressão de fases
-* Múltiplas telas (menu, jogo, sobre, etc.)
+* Coletáveis (Corações):
+Itens que aparecem na pista e aumentam a vida do jogador ao serem coletados.
 
-### Não Funcionais
+* Modos de Jogo:
+O jogo possui dois modos:
+Singleplayer (1 jogador)
+Multiplayer (2 jogadores)
 
-* Execução no navegador
-* Interface simples e intuitiva
-* Uso de requestAnimationFrame para desempenho
-* Código estruturado com POO
-* Portabilidade entre diferentes computadores
+* Progressão de Fases:
+O jogo possui fases com dificuldade crescente baseada na pontuação.
+
+* Interface (Telas):
+O sistema possui diferentes telas:
+Menu inicial
+Seleção de personagem
+Tela de jogo
+Tela "Como Jogar"
+Tela "Sobre"
+Tela de vitória e derrota
+
+* Sistema de Colisão:
+Detecta interações entre:
+Jogadores e inimigos
+Jogadores e itens coletáveis
+
+* Sistema de Áudio:
+O jogo possui sons para ações como:
+Movimento
+Pulo
+Colisão
+Vitória e derrota
+
+###  Regras de Negócio 
+* Dificuldade Progressiva:
+A cada fase, os inimigos ficam mais rápidos e mais numerosos.
+
+* Mudança de Cenário:
+O fundo do jogo muda conforme a fase.
+
+* Condição de Vitória (Singleplayer):
+O jogador vence ao atingir a pontuação necessária.
+
+* Condição de Derrota (Singleplayer):
+O jogo termina quando a vida do jogador chega a zero.
+
+* Condição de Vitória (Multiplayer):
+O jogo termina quando um dos jogadores perde todas as vidas.
+
+* Condição de Derrota (Multiplayer)
+O outro jogador é o vencedor.
+
+* Spawn de Inimigos:
+Os inimigos só aparecem se:
+Não ultrapassarem o limite máximo
+Respeitarem uma distância mínima entre si
+
+* Spawn de Corações:
+Os corações aparecem de forma aleatória e com baixa chance.
+
+* Pontuação por Desvio:
+O jogador só ganha pontos quando ultrapassa completamente um inimigo.
+
+* Controle de Estados:
+O jogo funciona com diferentes estados:
+menu
+menu de personagem
+jogo
+como jogar
+sobre
+
+###  Requisitos Não Funcionais 
+* Desempenho:
+O jogo utiliza requestAnimationFrame para garantir animação fluida.
+
+* Usabilidade:
+Interface simples, clara e fácil de usar, com controles intuitivos.
+
+* Portabilidade:
+O jogo roda diretamente no navegador, sem necessidade de instalação.
+
+* Confiabilidade:
+O sistema controla corretamente estados do jogo, evitando erros durante a execução.
+
+* Manutenibilidade:
+O código é organizado usando Programação Orientada a Objetos (POO), facilitando futuras melhorias.
+
+---
+
+## Especificações Técnicas
+
+- O jogo possui sistema de fases baseado em pontuação
+- A velocidade dos inimigos aumenta progressivamente
+- O número de inimigos cresce conforme a fase
+- O jogador inicia com 5 vidas
+- A pontuação é aumentada ao ultrapassar obstáculos
 
 ---
 
@@ -149,7 +236,7 @@ index.html
 
 ---
 
-## 🌐 Link do Projeto em Produção
+## Link do Projeto 
 
 https://game-skate-atualizado.vercel.app/
 
@@ -166,7 +253,7 @@ https://game-skate-atualizado.vercel.app/
 ## Créditos
 
 Projeto desenvolvido como parte da disciplina de Programação Orientada a Objetos.
-**Product Owner (Professor):** (coloque o nome do professor aqui)
+**Product Owner (Professor):** Carlos Roberto da Silva Filho
 
 ---
 

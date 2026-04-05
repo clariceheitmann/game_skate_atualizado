@@ -863,18 +863,18 @@ function desenhaSobre(){
     )
 
     t1.des_text(
-        'Desenvolvido por Clarice',
+        'Desenvolvido por Clarice Heitmann Santos',
         600,
         200,
         '#000000',
-        '22px QuinqueFive',
+        '18px QuinqueFive',
         '#ffdae7'
     )
 
     t1.des_text(
         'Este jogo foi criado como um projeto de estudo',
         600,
-        300,
+        250,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -883,7 +883,7 @@ function desenhaSobre(){
     t1.des_text(
         'Foco em programacao e desenvolvimento de jogos',
         600,
-        350,
+        300,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -892,7 +892,7 @@ function desenhaSobre(){
     t1.des_text(
         'GitHub:',
         600,
-        420,
+        370,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -901,7 +901,7 @@ function desenhaSobre(){
     t1.des_text(
         'github.com/clariceheitmann',
         600,
-        470,
+        420,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -910,7 +910,7 @@ function desenhaSobre(){
     t1.des_text(
         'Contato:',
         600,
-        540,
+        490,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
@@ -919,7 +919,25 @@ function desenhaSobre(){
     t1.des_text(
         'clarice_h_santos@estudante.sesisenai.org.br',
         600,
-        590,
+        540,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Professor orientador:',
+        600,
+        610,
+        '#000000',
+        '18px QuinqueFive',
+        '#ffdae7'
+    )
+
+    t1.des_text(
+        'Professor Carlos Roberto da Silva Filho',
+        600,
+        660,
         '#000000',
         '18px QuinqueFive',
         '#ffdae7'
