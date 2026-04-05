@@ -12,7 +12,7 @@ class Obj{
         this.imagens = {}
     }
 
-    des_carro(){
+    des_skatista(){
         if(this.img.complete && this.img.naturalWidth !== 0){
             des.drawImage(this.img, this.x, this.y, this.w, this.h)
         }
@@ -53,7 +53,6 @@ class GarotoSkatista extends Obj{
         this.gravidade = 0.6
         this.pulando = false
 
-        // 🔥 NOVO
         this.invencivel = 0
     }
 
@@ -138,30 +137,29 @@ class GarotoSkatista extends Obj{
             this.img = this.imagens[this.a]
         }
 
-        else if(this.velX !== 0 && !this.pulando){
+            else if(this.velX !== 0 && !this.pulando){
             this.anim("animacao_andando_", 3)
         }
 
-        else if(this.velY < 0){
+            else if(this.velY < 0){
             this.anim("animacao_pulando_", 4)
         }
 
-        else if(this.velY > 0){
+            else if(this.velY > 0){
             this.anim("animacao_caindo_", 2)
         }
     }
 
-    // 🔥 NOVO MÉTODO (piscar ao tomar dano)
     drawComDano(){
         if(this.invencivel > 0){
             if(Math.floor(this.invencivel / 5) % 2 === 0){
                 des.filter = "brightness(2)"
             }
+
             this.invencivel--
         }
-
-        this.des_carro()
-        des.filter = "none"
+            this.des_skatista()
+            des.filter = "none"
     }
 }
 
@@ -199,7 +197,7 @@ class Inimigos extends Obj{
 
     desenha(){
         if(this.ativo){
-            this.des_carro()
+            this.des_skatista()
         }
     }
 }
@@ -213,7 +211,7 @@ class Coracao extends Obj {
 
     this.tempo = 0
     this.escala = 1
-}
+    }
 
     spawn(){
         this.x = 1300

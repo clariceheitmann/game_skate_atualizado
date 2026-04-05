@@ -4,23 +4,19 @@ console.log(canvas)
 const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
     fonte.load().then(function(font){
         document.fonts.add(font);
-    });
+});
 
 let des = canvas.getContext('2d')
 console.log(des)
 
 let fundo1 = new Image()
 fundo1.src = './imgs/fundo1.png'
-
 let fundo2 = new Image()
 fundo2.src = './imgs/fundo2.png'
-
 let fundo3 = new Image()
 fundo3.src = './imgs/fundo3.png'
-
 let fundo4 = new Image()
 fundo4.src = './imgs/fundo4.png'
-
 let fundo5 = new Image()
 fundo5.src = './imgs/fundo5.png'
 
@@ -28,18 +24,17 @@ let fundo = fundo1
 
 let imgWin = new Image()
 imgWin.src = './imgs/trofeu.png'
-
 let imgGameOver = new Image()
 imgGameOver.src = './imgs/game_over.png'
-
-let imgMenu = new Image()
-imgMenu.src = './imgs/tela_inicial.png' 
 
 let imgP1Win = new Image()
 imgP1Win.src = './imgs/player_1_win.png'
 
 let imgP2Win = new Image()
 imgP2Win.src = './imgs/player_2_win.png'
+
+let imgMenu = new Image()
+imgMenu.src = './imgs/tela_inicial.png' 
 
 let chao = 600
 
@@ -118,33 +113,27 @@ let imagensPreload = []
 
 function preloadImagens(){
     let lista = [
-        // andando M
         './imgs/animacao_andando_1_M.png',
         './imgs/animacao_andando_2_M.png',
         './imgs/animacao_andando_3_M.png',
 
-        // pulando M
         './imgs/animacao_pulando_1_M.png',
         './imgs/animacao_pulando_2_M.png',
         './imgs/animacao_pulando_3_M.png',
         './imgs/animacao_pulando_4_M.png',
 
-        // caindo M
         './imgs/animacao_caindo_1_M.png',
         './imgs/animacao_caindo_2_M.png',
 
-        // andando F
         './imgs/animacao_andando_1_F.png',
         './imgs/animacao_andando_2_F.png',
         './imgs/animacao_andando_3_F.png',
 
-        // pulando F
         './imgs/animacao_pulando_1_F.png',
         './imgs/animacao_pulando_2_F.png',
         './imgs/animacao_pulando_3_F.png',
         './imgs/animacao_pulando_4_F.png',
 
-        // caindo F
         './imgs/animacao_caindo_1_F.png',
         './imgs/animacao_caindo_2_F.png'
     ]
@@ -161,7 +150,6 @@ document.addEventListener('keydown', (e) => {
    if((e.key === "Escape" || e.key === " ") && estado === "jogo"){
     pausado = !pausado
 }
-    // ===== MENU PRINCIPAL =====
     if (estado === "menu") {
         if (e.key === "1") {
             modo = "single";
@@ -214,8 +202,8 @@ document.addEventListener('keydown', (e) => {
             vx: Math.random()*4-2,
             vy: Math.random()*-3,
             vida: 30
-    })
-}
+            })
+        }
             skatistaM.velY = -18;
             skatistaM.pulando = true;
             somPulo.currentTime = 0;
@@ -253,9 +241,8 @@ document.addEventListener('click', (e) => {
     let x = e.offsetX;
     let y = e.offsetY;
 
-    // ===== CLIQUE NO BOTÃO PAUSE =====
-if(estado === "jogo"){
-    if(
+        if(estado === "jogo"){
+        if(
         x > botaoPause.x &&
         x < botaoPause.x + botaoPause.w &&
         y > botaoPause.y &&
@@ -266,22 +253,18 @@ if(estado === "jogo"){
     }
 }
 
-// ===== MENU PAUSE =====
 if(pausado){
 
-    // CONTINUAR
     if(x > 500 && x < 700 && y > 300 && y < 340){
         pausado = false
         return
     }
 
-    // REINICIAR
     if(x > 500 && x < 700 && y > 360 && y < 400){
         reiniciarJogo()
         return
     }
 
-    // MENU
     if(x > 500 && x < 700 && y > 420 && y < 460){
         estado = "menu"
         pausado = false
@@ -329,18 +312,18 @@ if(pausado){
         personagemEscolhido = "M"; 
         playerAtual = skatistaM; 
         estado = "jogo"; 
-        return; // 🔥
+        return; 
     }
     else if (x > 450 && x < 750 && y > 390 && y < 440) { 
         personagemEscolhido = "F"; 
         playerAtual = skatistaF; 
         estado = "jogo"; 
-        return; // 🔥
+        return; 
     }
 
     else if (x > 40 && x < 150 && y > 20 && y < 60) {
         estado = "menu";
-        return; // 🔥
+        return; 
     }
 }
 
@@ -365,15 +348,15 @@ function spawnInimigo(){
         if(inativos.length > 0){
             let podeSpawnar = true
 
-            ativos.forEach(i => {
-                if(i.x > 1300 - distanciaMinima){
-                    podeSpawnar = false
-                }
-            })
+        ativos.forEach(i => {
+            if(i.x > 1300 - distanciaMinima){
+                podeSpawnar = false
+            }
+        })
 
-            if(podeSpawnar){
-                let aleatorio = inativos[Math.floor(Math.random() * inativos.length)]
-                aleatorio.recomeca()
+        if(podeSpawnar){
+            let aleatorio = inativos[Math.floor(Math.random() * inativos.length)]
+            aleatorio.recomeca()
             }
         }
     }
@@ -383,7 +366,7 @@ function spawnCoracao(){
     if(!coracao.ativo){
         let chance = Math.random()
 
-        if(chance < 0.001){ // 🔥 controla raridade
+        if(chance < 0.001){ 
             coracao.spawn()
         }
     }
@@ -409,14 +392,14 @@ function game_over() {
     if(modo === "multi"){
 
     if(skatistaM.vida <= 0){
-    jogar = false
-    vencedor = "PLAYER 2 VENCEU!"
+        jogar = false
+        vencedor = "PLAYER 2 VENCEU!"
 }
 
-if(skatistaF.vida <= 0){
-    jogar = false
-    vencedor = "PLAYER 1 VENCEU!"
-}
+    if(skatistaF.vida <= 0){
+        jogar = false
+        vencedor = "PLAYER 1 VENCEU!"
+    }
 }
 
     if(!jogar){
@@ -453,7 +436,6 @@ if(skatistaF.vida <= 0){
         }
     }
 }
-
 
 function ver_fase() { 
     let pontosRef = (modo === "single") ? playerAtual.pontos : skatistaM.pontos
@@ -501,10 +483,8 @@ function ver_fase() {
 
 function colisao() {
 
-    // ===== COLISÃO COM INIMIGOS =====
     inimigos.forEach(i => {
 
-        // PLAYER 1 (M)
         if(i.ativo && skatistaM.colid(i) && skatistaM.invencivel <= 0){
             somBatida.play()
             i.ativo = false
@@ -519,7 +499,6 @@ function colisao() {
             })
         }
 
-        // PLAYER 2 (F)
         if(i.ativo && skatistaF.colid(i) && skatistaF.invencivel <= 0){
             somBatida.play()
             i.ativo = false
@@ -533,11 +512,8 @@ function colisao() {
                 vida: 60
             })
         }
-
     })
 
-
-    // ===== CORAÇÃO SINGLEPLAYER =====
     if(modo === "single" && coracao.ativo && playerAtual.colid(coracao)){
         coracao.ativo = false
         playerAtual.vida += 1
@@ -551,8 +527,6 @@ function colisao() {
         })
     }
 
-
-    // ===== CORAÇÃO MULTIPLAYER =====
     if(modo === "multi"){
 
         if(coracao.ativo && skatistaM.colid(coracao)){
@@ -602,20 +576,20 @@ function pontuacao() {
                 i.pontuado = true
             }
 
-            if(skatistaF.x > i.x + i.w){
-    skatistaF.pontos += 5
+        if(skatistaF.x > i.x + i.w){
+            skatistaF.pontos += 5
 
-    textosFlutuantes.push({
-        x: i.x,
-        y: i.y,
-        texto: "+5",
-        cor: "#ffdae7",
-        vida: 60
+            textosFlutuantes.push({
+            x: i.x,
+            y: i.y,
+            texto: "+5",
+            cor: "#ffdae7",
+            vida: 60
     })
 
     i.pontuado = true
-}
 
+    }
         }
     })
 }
@@ -638,44 +612,35 @@ function desenhaMenu(){
 
     let corSingle = "#ffdae7"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 280 && mouseY < 320){
-    corSingle = "#ffffff"
-}
+    if(mouseX > 450 && mouseX < 750 && mouseY > 280 && mouseY < 320){
+        corSingle = "#ffffff"
+    }
 
-
-
-t1.des_text('1 - Singleplayer', 450, 300, '#000000', '20px QuinqueFive', corSingle)
+    t1.des_text('1 - Singleplayer', 450, 300, '#000000', '20px QuinqueFive', corSingle)
 
     let corMulti = "#ffdae7"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 340 && mouseY < 380){
+    if(mouseX > 450 && mouseX < 750 && mouseY > 340 && mouseY < 380){
     corMulti = "#ffffff"
-}
+    }
 
-t1.des_text('2 - Multiplayer', 450, 360, '#000000', '20px QuinqueFive', corMulti)
-
-
+    t1.des_text('2 - Multiplayer', 450, 360, '#000000', '20px QuinqueFive', corMulti)
 
     let corComo = "#ffdae7"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 400 && mouseY < 440){
+    if(mouseX > 450 && mouseX < 750 && mouseY > 400 && mouseY < 440){
     corComo = "#ffffff"
-}
+    }
 
-t1.des_text('3 - Como Jogar', 450, 420, '#000000', '20px QuinqueFive', corComo)
-
-
+    t1.des_text('3 - Como Jogar', 450, 420, '#000000', '20px QuinqueFive', corComo)
 
     let corSobre = "#ffdae7"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 460 && mouseY < 500){
+    if(mouseX > 450 && mouseX < 750 && mouseY > 460 && mouseY < 500){
     corSobre = "#ffffff"
-}
+    }
 
-t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', corSobre)
-
-
-
+    t1.des_text('4 - Desenvolvedor', 450, 480, '#000000', '20px QuinqueFive', corSobre)
 
     let larguraTexto = des.measureText('3 - Como Jogar').width
     botaoComoJogar = { x: 450 - larguraTexto / 2, y: 420 - 20, w: larguraTexto, h: 30 }
@@ -701,40 +666,36 @@ function desenhaEscolha(){
     )
 
     let corM = "#ffdae7"
-let sizeM = "22px QuinqueFive"
+    let sizeM = "22px QuinqueFive"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 320 && mouseY < 370){
+    if(mouseX > 450 && mouseX < 750 && mouseY > 320 && mouseY < 370){
     corM = "#ffffff"
     sizeM = "26px QuinqueFive"
 }
 
 t1.des_text('1 - Player 1', 600, 350, '#000000', sizeM, corM)
 
-
-
-
     let corF = "#ffdae7"
-let sizeF = "22px QuinqueFive"
+    let sizeF = "22px QuinqueFive"
 
-if(mouseX > 450 && mouseX < 750 && mouseY > 390 && mouseY < 440){
-    corF = "#ffffff"
-    sizeF = "26px QuinqueFive"
-}
+    if(mouseX > 450 && mouseX < 750 && mouseY > 390 && mouseY < 440){
+        corF = "#ffffff"
+        sizeF = "26px QuinqueFive"
+    }
 
-t1.des_text('2 - Player 2', 600, 420, '#000000', sizeF, corF)
+    t1.des_text('2 - Player 2', 600, 420, '#000000', sizeF, corF)
 
     des.textAlign = "start"
 
-
     let corVoltar = "#ffdae7"
-let sizeVoltar = "16px QuinqueFive"
+    let sizeVoltar = "16px QuinqueFive"
 
-if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
     corVoltar = "#ffffff"
     sizeVoltar = "20px QuinqueFive"
-}
+    }
 
-t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
+    t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
 function desenhaComoJogar(){
@@ -832,14 +793,14 @@ function desenhaComoJogar(){
     des.textAlign = "start"
 
     let corVoltar = "#ffdae7"
-let sizeVoltar = "16px QuinqueFive"
+    let sizeVoltar = "16px QuinqueFive"
 
-if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
     corVoltar = "#ffffff"
     sizeVoltar = "20px QuinqueFive"
-}
+    }
 
-t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
+    t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
 function desenhaSobre(){
@@ -946,14 +907,14 @@ function desenhaSobre(){
     des.textAlign = "start"
 
     let corVoltar = "#ffdae7"
-let sizeVoltar = "16px QuinqueFive"
+    let sizeVoltar = "16px QuinqueFive"
 
-if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
+    if(mouseX > 40 && mouseX < 150 && mouseY > 20 && mouseY < 60){
     corVoltar = "#ffffff"
     sizeVoltar = "20px QuinqueFive"
-}
+    }
 
-t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
+    t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
 function reiniciarJogo(){
@@ -961,21 +922,18 @@ function reiniciarJogo(){
     skatistaM.invencivel = 60
     skatistaF.invencivel = 60
     
-    // estado do jogo
     jogar = true
     pausado = false
     iniciou = false
     contagem = 3
     tempoContagem = 0
 
-    // fase
     fase = 1
     maxInimigos = 1
     mensagemFase = ""
     tempoMensagemFase = 0
     fundo = fundo1
 
-    // reset players
     skatistaM.x = 100
     skatistaM.y = 180
     skatistaM.vida = 5
@@ -986,30 +944,24 @@ function reiniciarJogo(){
     skatistaF.vida = 5
     skatistaF.pontos = 0
 
-    // inimigos
     inimigos.forEach(i => {
         i.ativo = false
         i.pontuado = false
     })
 
-    // coração
     coracao.ativo = false
 
-    // efeitos
     particulas = []
     textosFlutuantes = []
 
-    // som
     musicaFundo.currentTime = 0
     musicaFundo.play()
 
-    // volta pro jogo direto
     estado = "jogo"
 }
 
 function desenha() {
 
-    // ===== CONTAGEM INICIAL =====
     if(estado === "jogo" && !iniciou){
         tempoContagem++
 
@@ -1027,19 +979,16 @@ function desenha() {
 
         t1.des_text(contagem, 600, 350, "#ffffff", "60px QuinqueFive", "#ffdae7")
         t1.des_text(
-    contagem,
-    600,
-    350,
-    "#ffdae7", // rosa
-    "60px QuinqueFive",
-    "#000000"  // contorno preto
+        contagem,
+        600,
+        350,
+        "#ffdae7", 
+        "60px QuinqueFive",
+        "#000000"  
 )
         return
-
-        
     }
 
-    // ===== TELAS =====
     if(estado === "como_jogar"){
         desenhaComoJogar()
         return
@@ -1060,12 +1009,10 @@ function desenha() {
         return
     }
 
-    // ===== FUNDO =====
     if (fundo.complete) {
         des.drawImage(fundo, 0, 0, 1200, 700)
     }
 
-    // ===== PAUSE (ANTES DE TUDO) =====
     if(pausado){
     des.fillStyle = "rgba(0,0,0,0.7)"
     des.fillRect(0,0,1200,700)
@@ -1083,10 +1030,8 @@ function desenha() {
     return
 }
 
-    // ===== JOGO =====
     if (jogar) {
 
-        // ===== BOTÃO PAUSE =====
         des.fillStyle = "#000000aa"
         des.fillRect(botaoPause.x, botaoPause.y, botaoPause.w, botaoPause.h)
 
@@ -1095,25 +1040,21 @@ function desenha() {
         des.textAlign = "center"
         des.fillText("II", botaoPause.x + botaoPause.w/2, botaoPause.y + 28)
 
-des.textAlign = "start"
+        des.textAlign = "start"
 
-        // PARTÍCULAS
         particulas.forEach(p => {
             des.fillStyle = "#ffffff"
             des.fillRect(p.x, p.y, 4, 4)
         })
 
-        // INIMIGOS
         inimigos.forEach(i => {
-            if(i.ativo) i.des_carro()
+            if(i.ativo) i.des_skatista()
         })
 
-        // CORAÇÃO
         if(coracao.ativo){
-            coracao.des_carro()
+            coracao.des_skatista()
         }
 
-        // PLAYER SINGLE
         if(modo === "single" && playerAtual){
             playerAtual.drawComDano()
 
@@ -1121,17 +1062,15 @@ des.textAlign = "start"
             t2.des_text('Vida: ' + playerAtual.vida, 40, 40, '#000000', '16px QuinqueFive', '#ffdae7')
         }
 
-        // MULTIPLAYER
         if(modo === "multi"){
             skatistaM.drawComDano()
             skatistaF.drawComDano()
 
             t1.des_text('P1: ' + skatistaM.pontos + ' | ❤ ' + skatistaM.vida, 40, 40, '#000', '16px QuinqueFive', '#a2b8e6')
 
-t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#000', '16px QuinqueFive', '#dea5e6')
+            t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#000', '16px QuinqueFive', '#dea5e6')
         }
 
-        // ===== MENSAGEM DE FASE (POR CIMA) =====
         if(tempoMensagemFase > 0){
             des.textAlign = "center"
 
@@ -1147,13 +1086,10 @@ t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#00
             des.textAlign = "start"
         }
 
-        // HUD
         fase_txt.des_text('Fase: ' + fase, 550, 40, '#000000', '16px QuinqueFive', '#ffdae7')
 
-    } 
-    else {
+    }else{
 
-        // ===== GAME OVER =====
         des.filter = "blur(8px) brightness(0.6)"
         des.fillStyle = "rgba(0, 0, 0, 0.7)"
         des.fillRect(300, 80, 600, 540)
@@ -1253,7 +1189,6 @@ t1.des_text('P2: ' + skatistaF.pontos + ' | ❤ ' + skatistaF.vida, 40, 80, '#00
         }
     }
 
-    // ===== TEXTOS FLUTUANTES =====
     textosFlutuantes.forEach(t=>{
         t1.des_text(t.texto, t.x, t.y, t.cor, '16px QuinqueFive', '#000000')
     })
@@ -1271,7 +1206,7 @@ function atualiza() {
     if (!jogar || estado !== "jogo") return;
 
     if(modo === "single"){
-        if(!playerAtual) return; // garante que playerAtual existe
+        if(!playerAtual) return; 
         playerAtual.mov_car()
         playerAtual.atualizaAnimacao()
     }
@@ -1290,6 +1225,7 @@ function atualiza() {
     t.y -= 1
     t.vida--
 })
+
 textosFlutuantes = textosFlutuantes.filter(t=>t.vida>0)
 
 particulas.forEach(p=>{
@@ -1299,8 +1235,6 @@ particulas.forEach(p=>{
     p.vida--
 })
 particulas = particulas.filter(p=>p.vida>0)
-
-
 
     inimigos.forEach(i => i.mov_car())
     spawnInimigo()
@@ -1316,7 +1250,7 @@ preloadImagens()
 requestAnimationFrame(main)
 
 let ultimoTempo = 0
-let intervalo = 1000 / 200 // 60 FPS (pode mudar depois)
+let intervalo = 1000 / 200 
 
 function main(tempoAtual) {
 
