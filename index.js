@@ -29,7 +29,6 @@ imgGameOver.src = './imgs/game_over.png'
 
 let imgP1Win = new Image()
 imgP1Win.src = './imgs/player_1_win.png'
-
 let imgP2Win = new Image()
 imgP2Win.src = './imgs/player_2_win.png'
 
@@ -91,16 +90,18 @@ let somPulo = new Audio('./imgs/som_skate_pulando.mp3')
 let somBatida = new Audio('./imgs/metal_pipe.mp3')
 let somGameOver = new Audio('./imgs/som_gameover.mp3')
 let somVitoria = new Audio('./imgs/som_vitoria.mp3')
+let somCoracao = new Audio('./imgs/somCoracao.mp3')
 
 musicaFundo.loop = true
 somAndar.loop = true
 
-musicaFundo.volume = 0.05
-somAndar.volume = 0.3
-somPulo.volume = 0.3
-somBatida.volume = 0.2
-somGameOver.volume = 0.4
-somVitoria.volume = 0.4
+musicaFundo.volume = 0.04
+somAndar.volume = 0.1
+somPulo.volume = 0.1
+somBatida.volume = 0.1
+somCoracao.volume = 0.3
+somGameOver.volume = 0.3
+somVitoria.volume = 0.3
 
 let jogar = true
 let fase = 1
@@ -158,6 +159,7 @@ document.addEventListener('keydown', (e) => {
 
         if (e.key === "2") {
             modo = "multi";
+            reiniciarJogo();
             estado = "jogo";
             skatistaM.x = 100;
             skatistaF.x = 300;
@@ -175,12 +177,14 @@ document.addEventListener('keydown', (e) => {
             personagemEscolhido = "M";
             playerAtual = skatistaM;
             estado = "jogo";
+            reiniciarJogo();
         }
 
         if (e.key === "2") {
             personagemEscolhido = "F";
             playerAtual = skatistaF;
             estado = "jogo";
+            reiniciarJogo();
         }
 
         if (e.key === "Escape") {
@@ -195,6 +199,7 @@ document.addEventListener('keydown', (e) => {
         if (e.key === 'ArrowLeft') skatistaM.velX = -5;
         if (e.key === 'ArrowRight') skatistaM.velX = 5;
         if (e.key === 'ArrowUp' && !skatistaM.pulando) {
+
             for(let i=0;i<6;i++){
             particulas.push({
             x: skatistaM.x + skatistaM.w/2,
@@ -213,6 +218,17 @@ document.addEventListener('keydown', (e) => {
         if (e.key === 'a') skatistaF.velX = -5;
         if (e.key === 'd') skatistaF.velX = 5;
         if (e.key === 'w' && !skatistaF.pulando) {
+
+            for(let i=0;i<6;i++){
+            particulas.push({
+            x: skatistaF.x + skatistaF.w/2,
+            y: skatistaF.y + skatistaF.h,
+            vx: Math.random()*4-2,
+            vy: Math.random()*-3,
+            vida: 30
+        })
+    }
+
             skatistaF.velY = -18;
             skatistaF.pulando = true;
             somPulo.currentTime = 0;
@@ -287,7 +303,7 @@ if(pausado){
 
     if (x > 450 && x < 750 && y > 340 && y < 380) { 
         modo = "multi"; 
-        estado = "jogo"; 
+        reiniciarJogo();
         skatistaM.x = 100; 
         skatistaF.x = 300; 
         playerAtual = null;
@@ -308,16 +324,20 @@ if(pausado){
 }
 
     if (estado === "menu_personagem") {
+
     if (x > 450 && x < 750 && y > 320 && y < 370) { 
         personagemEscolhido = "M"; 
         playerAtual = skatistaM; 
-        estado = "jogo"; 
+        modo = "single";
+        reiniciarJogo(); // ← AQUI
         return; 
     }
+
     else if (x > 450 && x < 750 && y > 390 && y < 440) { 
         personagemEscolhido = "F"; 
         playerAtual = skatistaF; 
-        estado = "jogo"; 
+        modo = "single";
+        reiniciarJogo(); // ← AQUI
         return; 
     }
 
@@ -485,38 +505,44 @@ function colisao() {
 
     inimigos.forEach(i => {
 
-        if(i.ativo && skatistaM.colid(i) && skatistaM.invencivel <= 0){
-            somBatida.play()
-            i.ativo = false
-            skatistaM.vida -= 1
+    if(i.ativo && skatistaM.colid(i) && skatistaM.invencivel <= 0){
+        somBatida.play()
+        i.ativo = false
+        skatistaM.vida -= 1
+        skatistaM.invencivel = 60 // ← AQUI
 
-            textosFlutuantes.push({
-                x: skatistaM.x,
-                y: skatistaM.y,
-                texto: "-1 VIDA",
-                cor: "#ff4d4d",
-                vida: 60
-            })
-        }
+    textosFlutuantes.push({
+        x: skatistaM.x,
+        y: skatistaM.y,
+        texto: "-1 VIDA",
+        cor: "#ff4d4d",
+        vida: 60
+    })
+}
 
-        if(i.ativo && skatistaF.colid(i) && skatistaF.invencivel <= 0){
-            somBatida.play()
-            i.ativo = false
-            skatistaF.vida -= 1
+    if(i.ativo && skatistaF.colid(i) && skatistaF.invencivel <= 0 &&
+        skatistaF.y >= chao - skatistaF.h - 5){
+        somBatida.play()
+        i.ativo = false
+        skatistaF.vida -= 1
+        skatistaF.invencivel = 60 // ← AQUI
 
-            textosFlutuantes.push({
-                x: skatistaF.x,
-                y: skatistaF.y,
-                texto: "-1 VIDA",
-                cor: "#ff4d4d",
-                vida: 60
-            })
-        }
+    textosFlutuantes.push({
+        x: skatistaF.x,
+        y: skatistaF.y,
+        texto: "-1 VIDA",
+        cor: "#ff4d4d",
+        vida: 60
+    })
+}
     })
 
     if(modo === "single" && coracao.ativo && playerAtual.colid(coracao)){
         coracao.ativo = false
         playerAtual.vida += 1
+
+        somCoracao.currentTime = 0 
+        somCoracao.play()     
 
         textosFlutuantes.push({
             x: playerAtual.x,
@@ -533,6 +559,9 @@ function colisao() {
             coracao.ativo = false
             skatistaM.vida += 1
 
+            somCoracao.currentTime = 0
+            somCoracao.play()
+
             textosFlutuantes.push({
                 x: skatistaM.x,
                 y: skatistaM.y,
@@ -545,6 +574,9 @@ function colisao() {
         if(coracao.ativo && skatistaF.colid(coracao)){
             coracao.ativo = false
             skatistaF.vida += 1
+
+            somCoracao.currentTime = 0
+            somCoracao.play()
 
             textosFlutuantes.push({
                 x: skatistaF.x,
@@ -929,6 +961,8 @@ function reiniciarJogo(){
     tempoContagem = 0
 
     fase = 1
+    faseAtualMostrada = 1
+
     maxInimigos = 1
     mensagemFase = ""
     tempoMensagemFase = 0
