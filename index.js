@@ -1,6 +1,8 @@
+//Pega o canvas do HTML
 let canvas = document.getElementById('des')
 console.log(canvas)
 
+//Fonte personalizada
 const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
     fonte.load().then(function(font){
         document.fonts.add(font);
@@ -9,6 +11,7 @@ const fonte = new FontFace('QuinqueFive', 'url(./fonts/QuinqueFive.ttf)');
 let des = canvas.getContext('2d')
 console.log(des)
 
+//Imagens de fundo e telas
 let fundo1 = new Image()
 fundo1.src = './imgs/fundo1.png'
 let fundo2 = new Image()
@@ -35,8 +38,10 @@ imgP2Win.src = './imgs/player_2_win.png'
 let imgMenu = new Image()
 imgMenu.src = './imgs/tela_inicial.png' 
 
+//Altura do chão
 let chao = 600
 
+//Objetos do jogo
 let cascaBanana = new Inimigos(0, 0, 70, 50, './imgs/cascaBanana.png')
 let coneTransito = new Inimigos(0, 0, 90, 90, './imgs/coneTransito.png')
 let hidrante = new Inimigos(0, 0, 100, 100, './imgs/hidrante.png')
@@ -52,10 +57,12 @@ let coracao = new Coracao(0, 0, 65, 65, './imgs/coracao.png')
 
 let playerAtual = skatistaM
 
+//Textos
 let t1 = new Text()
 let t2 = new Text()
 let fase_txt = new Text()
 
+//Interface
 let botaoComoJogar = {}
 let botaoSobre = {}
 
@@ -66,24 +73,30 @@ let botaoPause = {
     h: 40
 }
 
+//Estados do jogo
 let estado = "menu"
 let modo = ""
 let personagemEscolhido = "M"
 
+//Efeitos 
 let particulas = []
 let textosFlutuantes = []
 
+//Sistema de fase
 let mensagemFase = ""
 let tempoMensagemFase = 0
 
+//Pause e contagem 
 let pausado = false
 let contagem = 3
 let iniciou = false
 let tempoContagem = 0
 
+//Mouse
 let mouseX = 0
 let mouseY = 0
 
+//Sons e suas configurações
 let musicaFundo = new Audio('./imgs/musica_fundo.mp3')
 let somAndar = new Audio('./imgs/som_skate_andando.mp3')
 let somPulo = new Audio('./imgs/som_skate_pulando.mp3')
@@ -103,6 +116,7 @@ somCoracao.volume = 0.3
 somGameOver.volume = 0.3
 somVitoria.volume = 0.3
 
+//Controles do jogo
 let jogar = true
 let fase = 1
 let faseAtualMostrada = 1
@@ -110,6 +124,7 @@ let faseAtualMostrada = 1
 let maxInimigos = 1
 let distanciaMinima = 400
 
+//Preload
 let imagensPreload = []
 
 function preloadImagens(){
@@ -146,6 +161,7 @@ function preloadImagens(){
     })
 }
 
+//Teclado
 document.addEventListener('keydown', (e) => {
 
    if((e.key === "Escape" || e.key === " ") && estado === "jogo"){
@@ -241,6 +257,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+// Quando solta tecla → para movimento
 document.addEventListener('keyup', (e) => {
     if (estado === "jogo") {
         if (['ArrowLeft','ArrowRight'].includes(e.key)) skatistaM.velX = 0;
@@ -253,6 +270,7 @@ document.addEventListener('keyup', (e) => {
     }
 });
 
+//Mouse
 document.addEventListener('click', (e) => {
     let x = e.offsetX;
     let y = e.offsetY;
@@ -359,6 +377,7 @@ document.addEventListener('mousemove', (e)=>{
     mouseY = e.offsetY
 })
 
+//Spawn dos objetos inimigos
 function spawnInimigo(){
     let ativos = inimigos.filter(i => i.ativo)
 
@@ -382,6 +401,7 @@ function spawnInimigo(){
     }
 }
 
+//Spawn dos corações (vidas extras)
 function spawnCoracao(){
     if(!coracao.ativo){
         let chance = Math.random()
@@ -394,6 +414,7 @@ function spawnCoracao(){
 
 let vencedor = ""
 
+//Verifica a derrota ou vitoria
 function game_over() {
 
     if(modo === "single"){
@@ -457,6 +478,7 @@ function game_over() {
     }
 }
 
+//Sistema de fase (muda o fundo, texto com o nome da fase)
 function ver_fase() { 
     let pontosRef = (modo === "single") ? playerAtual.pontos : skatistaM.pontos
 
@@ -486,7 +508,7 @@ function ver_fase() {
         tempoMensagemFase = 120
         mensagemFase = "FASE 4"
         maxInimigos = 3
-        inimigos.forEach(i => i.vel = 9)
+        inimigos.forEach(i => i.vel = 8)
         fundo = fundo4
     }
 
@@ -496,11 +518,13 @@ function ver_fase() {
         tempoMensagemFase = 120
         mensagemFase = "FASE 5"
         maxInimigos = 3
-        inimigos.forEach(i => i.vel = 10)
+        inimigos.forEach(i => i.vel = 9)
         fundo = fundo5
     }
 }
 
+// Colisão de jogador com inimigos e corações 
+// Cria textos flutuantes 
 function colisao() {
 
     inimigos.forEach(i => {
@@ -590,6 +614,7 @@ function colisao() {
     }
 }
 
+//Verifica que quando passa do inimigo ganha pontos
 function pontuacao() {
     inimigos.forEach(i => {
 
@@ -626,6 +651,7 @@ function pontuacao() {
     })
 }
 
+//Telas (menu principal, escolha de personagem, tutorial e sobre)
 function desenhaMenu(){
     if(imgMenu.complete){
         des.drawImage(imgMenu, 0, 0, 1200, 700)
@@ -949,6 +975,7 @@ function desenhaSobre(){
     t1.des_text('← Voltar', 50, 50, '#000000', sizeVoltar, corVoltar)
 }
 
+//Reset, reinicia todo o jogo (vidas, pontos, fase, inimigos, efeitos, sons)
 function reiniciarJogo(){
 
     skatistaM.invencivel = 60
@@ -1228,6 +1255,7 @@ function desenha() {
     })
 }
 
+//Atualiza tudo (movimento, animação, inimigos, spawn, colisão)
 function atualiza() {
     if(pausado) return
 
@@ -1241,14 +1269,14 @@ function atualiza() {
 
     if(modo === "single"){
         if(!playerAtual) return; 
-        playerAtual.mov_car()
+        playerAtual.mov_skatista()
         playerAtual.atualizaAnimacao()
     }
 
     if(modo === "multi"){
-        skatistaM.mov_car()
+        skatistaM.mov_skatista()
         skatistaM.atualizaAnimacao()
-        skatistaF.mov_car()
+        skatistaF.mov_skatista()
         skatistaF.atualizaAnimacao()
     }
 
@@ -1270,7 +1298,7 @@ particulas.forEach(p=>{
 })
 particulas = particulas.filter(p=>p.vida>0)
 
-    inimigos.forEach(i => i.mov_car())
+    inimigos.forEach(i => i.mov_skatista())
     spawnInimigo()
     colisao()
     pontuacao()
@@ -1283,6 +1311,7 @@ particulas = particulas.filter(p=>p.vida>0)
 preloadImagens()
 requestAnimationFrame(main)
 
+//Controla o FPS 
 let ultimoTempo = 0
 let intervalo = 1000 / 200 
 
@@ -1295,14 +1324,17 @@ function main(tempoAtual) {
 
     ultimoTempo = tempoAtual
 
+    //Limpa a tela 
     des.clearRect(0, 0, 1200, 700)
 
     desenha()
 
+    // Atualiza lógica
     if (estado === "jogo") {
         atualiza()
     }
 
+    //// Loop infinito
     requestAnimationFrame(main)
 }
 
